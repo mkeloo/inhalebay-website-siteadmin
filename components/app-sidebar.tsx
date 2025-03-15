@@ -11,6 +11,7 @@ import {
     Search,
     Settings2,
     SquareTerminal,
+    Store,
 } from "lucide-react"
 
 import { NavUser } from "@/components/nav-user"
@@ -43,7 +44,6 @@ const data = {
     user: {
         name: "shadcn",
         email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
     },
     teams: [
         {
@@ -151,127 +151,44 @@ const data = {
     ],
     navSecondary: [
         {
-            title: "Getting Started",
+            title: "Analytics",
             url: "#",
             items: [
                 {
-                    title: "Installation",
-                    url: "#",
-                },
-                {
-                    title: "Project Structure",
-                    url: "#",
+                    title: "GA4 Analytics",
+                    url: "/dashboard/analytics/ga4-analytics",
                 },
             ],
         },
         {
-            title: "Building Your Application",
+            title: "Product Content",
             url: "#",
             items: [
                 {
-                    title: "Routing",
-                    url: "#",
+                    title: "Vapes",
+                    url: "/dashboard/product-content/vapes",
                 },
                 {
-                    title: "Data Fetching",
-                    url: "#",
-                    isActive: true,
+                    title: "Hemp Flowers",
+                    url: "/dashboard/product-content/hemp-flowers",
                 },
                 {
-                    title: "Rendering",
-                    url: "#",
-                },
-                {
-                    title: "Caching",
-                    url: "#",
-                },
-                {
-                    title: "Styling",
-                    url: "#",
-                },
-                {
-                    title: "Optimizing",
-                    url: "#",
-                },
-                {
-                    title: "Configuring",
-                    url: "#",
-                },
-                {
-                    title: "Testing",
-                    url: "#",
-                },
-                {
-                    title: "Authentication",
-                    url: "#",
-                },
-                {
-                    title: "Deploying",
-                    url: "#",
-                },
-                {
-                    title: "Upgrading",
-                    url: "#",
-                },
-                {
-                    title: "Examples",
-                    url: "#",
+                    title: "Deals & Promos",
+                    url: "/dashboard/product-content/deals-&-promos",
                 },
             ],
         },
         {
-            title: "API Reference",
+            title: "Store Content",
             url: "#",
             items: [
                 {
-                    title: "Components",
-                    url: "#",
+                    title: "Reviews",
+                    url: "/dashboard/store-content/reviews",
                 },
                 {
-                    title: "File Conventions",
-                    url: "#",
-                },
-                {
-                    title: "Functions",
-                    url: "#",
-                },
-                {
-                    title: "next.config.js Options",
-                    url: "#",
-                },
-                {
-                    title: "CLI",
-                    url: "#",
-                },
-                {
-                    title: "Edge Runtime",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Architecture",
-            url: "#",
-            items: [
-                {
-                    title: "Accessibility",
-                    url: "#",
-                },
-                {
-                    title: "Fast Refresh",
-                    url: "#",
-                },
-                {
-                    title: "Next.js Compiler",
-                    url: "#",
-                },
-                {
-                    title: "Supported Browsers",
-                    url: "#",
-                },
-                {
-                    title: "Turbopack",
-                    url: "#",
+                    title: "Gallery",
+                    url: "/dashboard/store-content/gallery",
                 },
             ],
         },
@@ -282,9 +199,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader className="w-full flex items-center justify-center pt-4">
-                <SidebarGroup className="py-0 group-data-[collapsible=icon]:hidden">
-                    <SidebarGroupContent className="">
-                        <h1 className="text-2xl font-bold text-center">Inhale Bay</h1>
+                <SidebarGroup className="py-0">
+                    <SidebarGroupContent className="w-full flex flex-row items-center justify-start gap-x-4">
+                        {/* Ensure the Store icon always remains visible */}
+                        <Store className="w-6 h-6 shrink-0" />
+
+                        {/* Hide the title when the sidebar is collapsed */}
+                        <h1 className="text-[22px] font-bold text-center group-data-[collapsible=icon]:hidden">
+                            Inhale Bay Admin
+                        </h1>
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarHeader>
@@ -328,13 +251,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarGroup className="group-data-[collapsible=icon]:hidden px-4 mt-4 gap-6">
                     {data.navSecondary.map((section) => (
                         <div key={section.title}>
-                            <SidebarGroupLabel className="">{section.title}</SidebarGroupLabel>
+                            <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
                             <SidebarMenu>
                                 {section.items.map((item) => (
                                     <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton asChild>
-                                            <a href={item.url}>
-                                                <span>{item.title}</span>
+                                            <a href={item.url} className="flex items-center gap-2">
+                                                <span>
+                                                    {item.title}
+                                                </span>
                                             </a>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
@@ -350,9 +275,4 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarRail />
         </Sidebar>
     )
-}
-
-function getComponentName(name: string) {
-    // convert kebab-case to title case
-    return name.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
 }

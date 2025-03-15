@@ -10,6 +10,7 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { Card } from "@/components/ui/card"
 
 export default async function AppLayout({
     children,
@@ -23,7 +24,7 @@ export default async function AppLayout({
         <SidebarProvider defaultOpen={defaultOpen}>
             <AppSidebar />
             <SidebarInset>
-                <header className="bg-background sticky inset-x-0 top-0 isolate z-10 flex shrink-0 items-center gap-2 border-b">
+                <header className="bg-background sticky inset-x-0 top-0 isolate z-10 flex shrink-0 items-center gap-2">
                     <div className="flex h-14 w-full items-center gap-2 px-4">
                         <SidebarTrigger className="-ml-1.5" />
                         <Separator
@@ -37,7 +38,10 @@ export default async function AppLayout({
                         </div>
                     </div>
                 </header>
-                {children}
+                {/* Main Content Area */}
+                <Card className="p-4 min-h-[calc(100vh-4rem)] w-full z-1">
+                    {children}
+                </Card>
             </SidebarInset>
         </SidebarProvider>
     )
