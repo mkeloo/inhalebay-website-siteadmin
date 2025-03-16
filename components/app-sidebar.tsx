@@ -192,6 +192,16 @@ const data = {
                 },
             ],
         },
+        {
+            title: "Documents",
+            url: "#",
+            items: [
+                {
+                    title: "Hemp Lab Certificates",
+                    url: "/dashboard/documents/hemp-coa",
+                },
+            ],
+        },
     ],
 }
 
