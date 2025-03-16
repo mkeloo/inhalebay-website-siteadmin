@@ -61,10 +61,13 @@ export async function updateStoreImage(
 export async function deleteStoreImage(id: number, imagePath: string) {
     const supabase = await createClient();
 
+    const correctedPath = imagePath.replace(/^\/+/, ""); // remove any leading slashes
     const { error: storageError } = await supabase.storage
         .from("inhale-bay-website")
-        .remove([imagePath]);
+        .remove([correctedPath]);
     if (storageError) throw storageError;
+
+    console.log("imagePath", imagePath);
 
     const { error: deleteError } = await supabase
         .from("website_store_images")

@@ -169,19 +169,19 @@ export default function HempCertificateOfAnalysis() {
                                     size={200}
                                     ecLevel="Q"
                                     qrStyle="dots"
-                                    fgColor="#FFFFFF"
-                                    bgColor="#000000"
+                                    fgColor="#000000"
+                                    bgColor="#FFFFFF"
                                     style={{ borderRadius: 10 }}
                                     quietZone={10}
 
                                     // fgColor="#7EC8E3"
                                     // bgColor="#00008B"
-                                    logoImage={inhalebaylogo.src}
-                                    logoWidth={55}
-                                    logoOpacity={1}
-                                    logoPaddingStyle='circle'
-                                    logoPadding={5}
-                                    removeQrCodeBehindLogo={true}
+                                    // logoImage={inhalebaylogo.src}
+                                    // logoWidth={55}
+                                    // logoOpacity={1}
+                                    // logoPaddingStyle='circle'
+                                    // logoPadding={5}
+                                    // removeQrCodeBehindLogo={true}
 
                                     /*
                                       Use eyeRadius to give the QR code "eyes" (corner squares) rounded corners.

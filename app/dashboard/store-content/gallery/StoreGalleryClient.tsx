@@ -20,7 +20,8 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { uploadStoreImage } from "@/app/actions/uploadStoreImages";
 import { updateStoreImage, updateSortOrder, deleteStoreImage } from "@/app/actions/websiteStoreImages";
-import { Hand, X } from "lucide-react";
+import { GripVertical, Hand, X } from "lucide-react";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 type Image = {
     id: number;
@@ -111,6 +112,7 @@ export default function StoreGalleryClient({ images }: Props) {
                 setImageList((prev) => prev.filter((img) => img.id !== id)); // remove from local state
                 toast.success("Image deleted successfully!");
                 router.refresh();
+                console.log("Deleted image with ID:", id);
             } catch (err: any) {
                 toast.error(`Failed to delete image: ${err.message}`);
             }
@@ -128,6 +130,9 @@ export default function StoreGalleryClient({ images }: Props) {
                     </DialogTrigger>
                     <VisuallyHidden.Root>
                         <DialogTitle>Upload Image</DialogTitle>
+                    </VisuallyHidden.Root>
+                    <VisuallyHidden.Root>
+                        <DialogDescription>Upload Image Dialog box</DialogDescription>
                     </VisuallyHidden.Root>
                     <DialogContent>
                         <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
@@ -148,7 +153,7 @@ export default function StoreGalleryClient({ images }: Props) {
             </div>
 
             {mounted && (
-                <Card className="w-full h-full p-6 mt-4">
+                <Card className="w-full h-full px-6 py-10 mt-4">
                     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                         <SortableContext items={imageList.map(i => i.id)} strategy={verticalListSortingStrategy}>
                             <div className="grid grid-cols-4 gap-4">
@@ -168,7 +173,7 @@ export default function StoreGalleryClient({ images }: Props) {
                         <SheetTitle>Edit Image</SheetTitle>
                     </SheetHeader>
                     {selectedImage && (
-                        <div className="space-y-4">
+                        <div className="space-y-4 px-4">
                             <img
                                 src={`https://dnltndrwudjaskjwczvm.supabase.co/storage/v1/object/public/inhale-bay-website${selectedImage.image_src}`}
                                 alt={selectedImage.image_alt}
@@ -247,6 +252,9 @@ function SortableImage({
         isDragging,
     } = useSortable({ id: img.id });
 
+    // Local state for confirmation dialog
+    const [openConfirm, setOpenConfirm] = useState(false);
+
     // Only increase z-index while dragging
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -256,20 +264,55 @@ function SortableImage({
 
     return (
         <Card ref={setNodeRef} style={style} {...attributes} className="relative mx-2 !gap-0">
+            {/* Confirm Delete Dialog */}
+            <Dialog open={openConfirm} onOpenChange={setOpenConfirm}>
+                <DialogContent className="p-4">
+                    <DialogTitle className="text-lg font-bold">
+                        Confirm Delete
+                    </DialogTitle>
+                    <p className="mt-2 text-sm">
+                        Are you sure you want to delete this image?
+                    </p>
+                    <div className="mt-4 flex justify-end gap-2">
+                        <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onDelete(img.id);
+                                setOpenConfirm(false);
+                            }}
+                        >
+                            Delete
+                        </Button>
+                        <Button
+                            size="sm"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenConfirm(false);
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+
             {/* Red X in top-right for Delete */}
             <button
                 className="absolute -top-4 -right-2 p-2 bg-red-500 text-white rounded-full active:scale-90 hover:bg-red-400 transition-colors duration-150"
                 onClick={(e) => {
                     e.stopPropagation(); // prevent drag events
-                    onDelete(img.id);
+                    setOpenConfirm(true);
                 }}
             >
                 <X size={16} />
             </button>
 
             {/* Dedicated drag handle */}
-            <div {...listeners} className="absolute top-0 left-0 p-3 rounded-xl cursor-move text-xs text-white bg-blue-500/65 ">
-                <Hand size={24} />
+            <div {...listeners} className="absolute -top-4 -left-2 p-2 rounded-xl cursor-move text-xs text-white bg-gray-500/65 active:scale-90 hover:bg-gray-400 transition-colors duration-150">
+                <GripVertical size={20} />
             </div>
 
             {/* Image Preview */}
