@@ -7,7 +7,7 @@ export async function uploadStoreImage(formData: FormData) {
     // Retrieve fields from the form data
     const file = formData.get("file") as File | null;
     const imageAlt = formData.get("imageAlt") as string;
-    const sortOrder = formData.get("sortOrder") as string;
+    let sortOrder = formData.get("sortOrder") as string;
 
     if (!file) {
         throw new Error("No file provided");
@@ -28,6 +28,20 @@ export async function uploadStoreImage(formData: FormData) {
     }
 
     const siteUrlId = settingData.id;
+
+    // If sortOrder is empty, automatically assign the next sort value
+    if (!sortOrder || sortOrder.trim() === "") {
+        const { data: sortData, error: sortError } = await supabase
+            .from("website_store_images")
+            .select("sort")
+            .order("sort", { ascending: false })
+            .limit(1);
+
+        if (sortError) {
+            throw sortError;
+        }
+        sortOrder = sortData && sortData.length > 0 ? String(Number(sortData[0].sort) + 1) : "1";
+    }
 
     // Create a unique file path for storage
     const filePath = `/store-gallery-images/${Date.now()}-${file.name}`;
