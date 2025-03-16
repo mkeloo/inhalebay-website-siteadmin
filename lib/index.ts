@@ -1,7 +1,7 @@
 // Base URL for Certificates of Analysis (COA) files
 export const coaBaseURL = "https://inhalebaycertificates.com/";
 
-// Certificates of Analysis (COA) for Delta-8 THC products
+// Certificates of Analysis (COA) for THC products
 export const hempCOA = [
     { id: 1, file_name: "GMO_Grapes_THCA_Flower_COA_11:24.pdf", file_type: "application/pdf", file_size_kb: 298.22, file_url: "GMO_Grapes_THCA_Flower_COA_11%3A24.pdf" },
     { id: 2, file_name: "Gelato_45_THCA_Flower_COA_11:24.pdf", file_type: "application/pdf", file_size_kb: 297.14, file_url: "Gelato_45_THCA_Flower_COA_11%3A24.pdf" },
