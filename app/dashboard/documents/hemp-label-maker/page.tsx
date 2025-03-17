@@ -1,220 +1,289 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { coaBaseURL, hempCOA } from "@/lib/index";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { fetchAllHempLabCertificates } from "../../../actions/hempLabCOA";
 import { QRCode } from "react-qrcode-logo";
 import inhalebaylogo from "@/assets/InhaleBayLogo.svg";
+import { coaBaseURL, hempCOA } from "@/lib/index";
+import jsPDF from "jspdf";
+// import html2canvas from "html2canvas";
+import { toPng } from "html-to-image";
 
 
-// Number of items per page
-const ITEMS_PER_PAGE = 13;
+// 1 inch ~ 96px (approx)
+const INCH_TO_PX = 96;
+
+const WARNINGS = "Warning: This product contains hemp-derived compounds. Keep out of reach of children.";
+const LOGO_PLACEHOLDER = inhalebaylogo;
 
 export default function HempLabelMaker() {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [selectedFile, setSelectedFile] = useState<string | null>(null);
-    const [qrCodeData, setQrCodeData] = useState<string | null>(null);
+    // States for label size
+    const [labelWidth, setLabelWidth] = useState(3);   // default 3 inches
+    const [labelHeight, setLabelHeight] = useState(4); // default 4 inches
 
-    // Calculate total pages
-    const totalPages = Math.ceil(hempCOA.length / ITEMS_PER_PAGE);
+    // States for label content
+    const [productName, setProductName] = useState("");
+    const [productWeight, setProductWeight] = useState("1g");
+    const [qrCodeValue, setQrCodeValue] = useState("");
+    const [generatedQR, setGeneratedQR] = useState("");
+    const [selectedFile, setSelectedFile] = useState<string>("");
 
-    // Get current page items
-    const currentItems = hempCOA.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-    );
+    // NEW: Refs for the label previews
+    const frontLabelRef = useRef<HTMLDivElement>(null!);
+    const backLabelRef = useRef<HTMLDivElement>(null!);
 
-    // Generate QR Code
-    const generateQRCode = () => {
-        if (!selectedFile) return;
-        setQrCodeData(`${coaBaseURL}${selectedFile}`);
-    };
 
-    // Copy QR Code URL to clipboard
-    const copyToClipboard = () => {
-        if (qrCodeData) {
-            navigator.clipboard.writeText(qrCodeData);
-            // alert("QR Code URL copied to clipboard!");
+    function handleGenerateQR() {
+        if (!qrCodeValue) return;
+        setGeneratedQR(qrCodeValue);
+    }
+
+
+    // Use html-to-image instead of html2canvas:
+    async function downloadPDF(ref: React.RefObject<HTMLDivElement>, filename: string) {
+        if (!ref.current) return;
+        try {
+            const dataUrl = await toPng(ref.current);
+            const img = new Image();
+            img.src = dataUrl;
+            img.onload = () => {
+                const pdf = new jsPDF({
+                    orientation: "portrait",
+                    unit: "px",
+                    format: [img.width, img.height],
+                });
+                pdf.addImage(img, "PNG", 0, 0, img.width, img.height);
+                pdf.save(filename);
+            };
+        } catch (error) {
+            console.error("Failed to create PDF:", error);
         }
-    };
+    }
 
-    // Download QR Code as an image
-    const downloadQRCode = () => {
-        const canvas = document.getElementById("qrCodeCanvas") as HTMLCanvasElement;
-        if (canvas && selectedFile) {
-            const selectedFileData = hempCOA.find((file) => file.file_url === selectedFile);
-            // Use the file name if found; otherwise fallback to a default name
-            const originalName = selectedFileData ? selectedFileData.file_name : "qrcode";
-            // Sanitize the file name by replacing characters that can cause issues
-            const safeName = originalName.replace(/[:\/\\]/g, "_");
+    async function downloadImage(ref: React.RefObject<HTMLDivElement>, filename: string) {
+        if (!ref.current) return;
+        try {
+            const dataUrl = await toPng(ref.current);
             const link = document.createElement("a");
-            link.href = canvas.toDataURL("image/png");
-            link.download = `QR_CODE_${safeName}.png`;
+            link.download = filename;
+            link.href = dataUrl;
             link.click();
+        } catch (error) {
+            console.error("Failed to create image:", error);
         }
+    }
+
+    // Inline styles for labels
+    const styleFront: React.CSSProperties = {
+        width: `${labelWidth * INCH_TO_PX}px`,
+        height: `${labelHeight * INCH_TO_PX}px`,
+        border: "1px solid #ccc",
+        padding: "8px",
+        position: "relative",
+        color: "#000000",
+        backgroundColor: "#FFFFFF",
+    };
+    const styleBack: React.CSSProperties = {
+        width: `${labelWidth * INCH_TO_PX}px`,
+        height: `${labelHeight * INCH_TO_PX}px`,
+        border: "1px solid #ccc",
+        padding: "8px",
+        position: "relative",
+        color: "#000000",
+        backgroundColor: "#FFFFFF",
     };
 
     return (
-        <div className="w-full h-full flex flex-col items-center justify-start gap-6 pb-10">
-            {/* Table */}
-            <Card className="w-full p-6">
-                <h2 className="text-xl font-semibold mb-4">Hemp Certificate of Analysis</h2>
+        <div className="p-6 space-y-6">
+            <Card className="p-4 space-y-4">
+                <h2 className="text-xl font-semibold mb-2">Hemp Label Maker</h2>
 
-                <div className="overflow-x-auto">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-16">ID</TableHead>
-                                <TableHead>File Name</TableHead>
-                                <TableHead>File Type</TableHead>
-                                <TableHead className="w-32">File Size</TableHead>
-                                <TableHead className="w-32 text-center">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {currentItems.map((file) => (
-                                <TableRow key={file.id}>
-                                    <TableCell>{file.id}</TableCell>
-                                    <TableCell className="truncate max-w-xs">{file.file_name}</TableCell>
-                                    <TableCell>{file.file_type}</TableCell>
-                                    <TableCell>{file.file_size_kb.toFixed(2)} KB</TableCell>
-                                    <TableCell className="text-center">
-                                        <a
-                                            href={`${coaBaseURL}${file.file_url}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 hover:underline"
-                                        >
-                                            View PDF
-                                        </a>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                {/* LABEL SIZE */}
+                <div className="flex items-center gap-4">
+                    <div>
+                        <Label>Label Width (inches)</Label>
+                        <Select value={String(labelWidth)} onValueChange={(val) => setLabelWidth(Number(val))}>
+                            <SelectTrigger className="w-[120px]">
+                                <SelectValue placeholder="Width" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {[...Array(10)].map((_, i) => {
+                                    const inch = i + 1;
+                                    return (
+                                        <SelectItem key={inch} value={String(inch)}>
+                                            {inch}"
+                                        </SelectItem>
+                                    );
+                                })}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div>
+                        <Label>Label Height (inches)</Label>
+                        <Select value={String(labelHeight)} onValueChange={(val) => setLabelHeight(Number(val))}>
+                            <SelectTrigger className="w-[120px]">
+                                <SelectValue placeholder="Height" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {[...Array(10)].map((_, i) => {
+                                    const inch = i + 1;
+                                    return (
+                                        <SelectItem key={inch} value={String(inch)}>
+                                            {inch}"
+                                        </SelectItem>
+                                    );
+                                })}
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
-                {/* Pagination Controls */}
-                <div className="flex justify-between items-center mt-4">
-                    <Button
-                        variant="outline"
-                        disabled={currentPage === 1}
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    >
-                        Previous
-                    </Button>
+                {/* PRODUCT NAME + WEIGHT */}
+                <div className="flex items-center gap-4">
+                    <div>
+                        <Label htmlFor="productName">Product Name</Label>
+                        <Input
+                            id="productName"
+                            value={productName}
+                            onChange={(e) => setProductName(e.target.value)}
+                            placeholder="e.g. Hybrid Hemp"
+                        />
+                    </div>
 
-                    <span className="text-gray-700">
-                        Page {currentPage} of {totalPages}
-                    </span>
-
-                    <Button
-                        variant="outline"
-                        disabled={currentPage === totalPages}
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    >
-                        Next
-                    </Button>
+                    <div>
+                        <Label>Weight</Label>
+                        <Select value={productWeight} onValueChange={setProductWeight}>
+                            <SelectTrigger className="w-[100px]">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="1g">1g</SelectItem>
+                                <SelectItem value="4g">4g</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
-            </Card>
 
-            {/* QR Code Generator for the PDF Files */}
-            <Card className="w-full h-full p-6 pb-12">
-                <h2 className="text-xl font-semibold mb-4">QR Code Generator</h2>
-
-                <div className="w-full h-full flex flex-row items-center justify-center gap-4">
-                    {/* Left Side: File Selection */}
+                {/* QR CODE INPUT with File Selector */}
+                <div className="flex gap-4">
+                    {/* Left Side: File Selector */}
                     <Card className="w-1/2 h-96 p-4 flex flex-col">
-                        <h3 className="text-xl font-bold mb-2 text-center py-3">Generate QR Code for Files</h3>
-
-                        {/* Scrollable List */}
+                        <h3 className="text-xl font-bold mb-2 text-center py-3">
+                            Select a Document
+                        </h3>
                         <div className="flex-1 overflow-y-auto dark:bg-slate-800 bg-neutral-300 rounded-lg">
                             <RadioGroup
                                 value={selectedFile || ""}
-                                onValueChange={setSelectedFile}
+                                onValueChange={(val) => {
+                                    setSelectedFile(val);
+                                    setQrCodeValue(val); // automatically copy the selected file URL
+                                }}
                                 className="space-y-2 p-4"
                             >
-                                {hempCOA.map((file) => (
-                                    <div key={file.id} className="flex items-center gap-2">
-                                        <RadioGroupItem value={file.file_url} id={`file-${file.id}`} />
-                                        <Label htmlFor={`file-${file.id}`} className="cursor-pointer">
-                                            {file.file_name}
-                                        </Label>
-                                    </div>
-                                ))}
+                                {hempCOA.map((file) => {
+                                    const fileUrl = `${coaBaseURL}${file.file_url}`;
+                                    return (
+                                        <div key={file.id} className="flex items-center gap-2">
+                                            <RadioGroupItem value={fileUrl} id={`file-${file.id}`} />
+                                            <Label htmlFor={`file-${file.id}`} className="cursor-pointer">
+                                                {file.file_name}
+                                            </Label>
+                                        </div>
+                                    );
+                                })}
                             </RadioGroup>
                         </div>
-
-                        {/* Fixed Button */}
-                        <Button
-                            className="mt-4 w-full"
-                            onClick={generateQRCode}
-                            disabled={!selectedFile}
-                        >
-                            Generate
-                        </Button>
                     </Card>
 
-                    {/* Right Side: QR Code Display */}
-                    <Card className="w-1/2 h-96 p-4 flex flex-col items-center justify-center gap-4 dark:bg-slate-800 bg-neutral-300">
-                        {qrCodeData ? (
-                            <>
+                    {/* Right Side: Manual QR Code Input */}
+                    <div className="w-1/2 space-y-2">
+                        <Label>QR Code Link or Text</Label>
+                        <Input
+                            value={qrCodeValue}
+                            onChange={(e) => setQrCodeValue(e.target.value)}
+                            placeholder="e.g. https://example.com/lab-report"
+                        />
+                        <Button onClick={handleGenerateQR}>Generate QR</Button>
+                    </div>
+                </div>
+            </Card>
+
+            {/* LABEL PREVIEW CONTAINER */}
+            <div className="w-full flex flex-row items-center justify-center gap-10 rounded-2xl p-10"
+                style={{ backgroundColor: "rgba(0, 0, 0, 0.8)" }}  // use rgba here instead of an oklch function
+            >
+                {/* FRONT LABEL */}
+                <div className="w-full flex flex-col items-center justify-center gap-y-2">
+                    <h1 className="text-2xl text-center text-white font-bold">FRONT LABEL</h1>
+                    <Card ref={frontLabelRef} className="p-4 space-y-2 !rounded-none" style={styleFront}>
+                        <div className="flex justify-center items-center">
+                            <img src={LOGO_PLACEHOLDER.src} alt="Logo" style={{ maxHeight: 40 }} />
+                        </div>
+                        <div className="text-center mt-2">
+                            <h3 className="font-bold">{productName || "Product Name"}</h3>
+                            <p>{productWeight}</p>
+                        </div>
+                        {generatedQR && (
+                            <div className="absolute bottom-2 right-2">
                                 <QRCode
-                                    id="qrCodeCanvas"
-                                    value={qrCodeData}
-                                    size={200}
-                                    ecLevel="Q"
+                                    value={generatedQR}
+                                    size={120}
+                                    ecLevel="H"
                                     qrStyle="dots"
                                     fgColor="#000000"
                                     bgColor="#FFFFFF"
                                     style={{ borderRadius: 10 }}
-                                    quietZone={10}
-
-                                    // fgColor="#7EC8E3"
-                                    // bgColor="#00008B"
-                                    // logoImage={inhalebaylogo.src}
-                                    // logoWidth={55}
-                                    // logoOpacity={1}
-                                    // logoPaddingStyle='circle'
-                                    // logoPadding={5}
-                                    // removeQrCodeBehindLogo={true}
-
-                                    /*
-                                      Use eyeRadius to give the QR code "eyes" (corner squares) rounded corners.
-                                      You can define a single object for all corners OR an array of objects
-                                      for top-left, top-right, bottom-left corners.
-                                    */
+                                    quietZone={0}
                                     eyeRadius={[
-                                        // Top-left eye
                                         { outer: 12, inner: 4 },
-                                        // Top-right eye
                                         { outer: 12, inner: 4 },
-                                        // Bottom-left eye
                                         { outer: 12, inner: 4 },
                                     ]}
-                                // eyeColor={"#00008B"}
-
                                 />
-                                <p className="text-sm text-center break-all">{qrCodeData}</p>
-                                <div className="flex gap-2">
-                                    <Button variant="outline" onClick={copyToClipboard}>
-                                        Copy
-                                    </Button>
-                                    <Button variant="outline" onClick={downloadQRCode}>
-                                        Download
-                                    </Button>
-                                </div>
-                            </>
-                        ) : (
-                            <p className="text-gray-500">Select a file to generate QR code.</p>
+                            </div>
                         )}
                     </Card>
                 </div>
-            </Card>
+
+                {/* BACK LABEL */}
+                <div className="w-full flex flex-col items-center justify-center gap-y-2">
+                    <h1 className="text-2xl text-center text-white font-bold">BACK LABEL</h1>
+                    <Card ref={backLabelRef} className="p-4 space-y-2 !rounded-none" style={styleBack}>
+                        <h4 className="font-bold">Warnings:</h4>
+                        <p className="text-sm">{WARNINGS}</p>
+                        <p className="text-xs absolute bottom-2">
+                            Hemp product. Keep away from children. For legal use only.
+                        </p>
+                    </Card>
+                </div>
+            </div>
+
+            {/* DOWNLOAD BUTTONS */}
+            <div className="w-full flex flex-col items-center justify-center gap-4 mt-6">
+                <div className="flex gap-4">
+                    <Button onClick={() => downloadPDF(frontLabelRef, `${productName ? productName.replace(/\s+/g, "-").toLowerCase() + "-front-label" : "front-label"}.pdf`)}>
+                        Download Front as PDF
+                    </Button>
+                    <Button onClick={() => downloadPDF(backLabelRef, `${productName ? productName.replace(/\s+/g, "-").toLowerCase() + "-back-label" : "back-label"}.pdf`)}>
+                        Download Back as PDF
+                    </Button>
+                </div>
+                <div className="flex gap-4">
+                    <Button onClick={() => downloadImage(frontLabelRef, `${productName ? productName.replace(/\s+/g, "-").toLowerCase() + "-front-label" : "front-label"}.png`)}>
+                        Download Front as Image
+                    </Button>
+                    <Button onClick={() => downloadImage(backLabelRef, `${productName ? productName.replace(/\s+/g, "-").toLowerCase() + "-back-label" : "back-label"}.png`)}>
+                        Download Back as Image
+                    </Button>
+                </div>
+            </div>
         </div>
     );
 }
