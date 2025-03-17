@@ -200,6 +200,10 @@ const data = {
                     title: "Hemp Lab Certificates",
                     url: "/dashboard/documents/hemp-coa",
                 },
+                {
+                    title: "Hemp Label Maker",
+                    url: "/dashboard/documents/hemp-label-maker",
+                },
             ],
         },
     ],
