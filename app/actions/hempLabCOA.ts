@@ -26,7 +26,7 @@ export async function fetchAllHempLabCertificates(): Promise<{
         const { data, error } = await supabase
             .from('hemp_lab_certificates')
             .select('*')
-            .order("serial_id", { ascending: false });
+            .order("serial_id", { ascending: true });
 
         if (error) {
             console.error('Error fetching hemp lab certificates:', error);
