@@ -172,10 +172,10 @@ const data = {
                     title: "Hemp Flowers",
                     url: "/dashboard/product-content/hemp-flowers",
                 },
-                {
-                    title: "Deals & Promos",
-                    url: "/dashboard/product-content/deals-&-promos",
-                },
+                // {
+                //     title: "Deals & Promos",
+                //     url: "/dashboard/product-content/deals-&-promos",
+                // },
             ],
         },
         {
