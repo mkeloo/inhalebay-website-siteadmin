@@ -112,7 +112,7 @@ export async function uploadStoreImagesBulk(formData: FormData): Promise<void> {
     // For each file, also read the matching alt text
     for (let i = 0; i < rawFiles.length; i++) {
         const file = rawFiles[i];
-        console.log("Uploading file:", file.name, file.size);
+        // console.log("Uploading file:", file.name, file.size);
 
         try {
             const altKey = `alt-${i}`;
@@ -144,7 +144,7 @@ export async function uploadStoreImagesBulk(formData: FormData): Promise<void> {
                 throw insertError;
             }
 
-            console.log("File uploaded + inserted successfully:", file.name);
+            // console.log("File uploaded + inserted successfully:", file.name);
         } catch (err) {
             console.error("Bulk upload error for file:", file.name, err);
             throw err;
