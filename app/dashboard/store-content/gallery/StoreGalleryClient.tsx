@@ -228,7 +228,7 @@ export default function StoreGalleryClient({ images }: Props) {
                 <Card className="w-full h-full px-6 py-10 mt-4">
                     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                         <SortableContext items={imageList.map(i => i.id)} strategy={verticalListSortingStrategy}>
-                            <div className="grid grid-cols-4 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 lg:gap-x-6 gap-y-10">
                                 {imageList.map(img => (
                                     <SortableImage key={img.id} img={img} onSelect={setSelectedImage} onDelete={handleDelete} // pass down
                                     />
