@@ -19,9 +19,11 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { uploadStoreImage } from "@/app/actions/uploadStoreImages";
-import { updateStoreImage, updateSortOrder, deleteStoreImage } from "@/app/actions/websiteStoreImages";
+import { updateStoreImage, updateSortOrder, deleteStoreImage, uploadStoreImagesBulk } from "@/app/actions/websiteStoreImages";
 import { GripVertical, Hand, X } from "lucide-react";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BulkUploader } from "@/components/siteadmin/MediaBrowser/BulkUploader";
 
 type Image = {
     id: number;
@@ -42,9 +44,15 @@ export default function StoreGalleryClient({ images }: Props) {
     const [newAlt, setNewAlt] = useState("");
     const [newFile, setNewFile] = useState<File | null>(null);
     const [newSort, setNewSort] = useState<number>();
-    const [isUploading, setIsUploading] = useState(false); // Track upload state
-    const formRef = useRef<HTMLFormElement>(null); // Reference to form
     const [mounted, setMounted] = useState(false);
+
+
+    // For single upload
+    const [isUploading, setIsUploading] = useState(false);
+    const formRef = useRef<HTMLFormElement>(null);
+
+    // For bulk upload
+    const bulkFormRef = useRef<HTMLFormElement>(null);
 
     useEffect(() => {
         setMounted(true);
@@ -66,6 +74,42 @@ export default function StoreGalleryClient({ images }: Props) {
                 formRef.current?.reset();
             } catch (err: any) {
                 toast.error(`Upload failed: ${err.message}`);
+            } finally {
+                setIsUploading(false);
+            }
+        });
+    }
+
+    // New bulk-upload logic (placeholder example)
+    async function handleBulkSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const files = formData.getAll("files") as File[];
+
+        // Limit to 10 images
+        if (files.length === 0) {
+            toast.error("No files selected.");
+            return;
+        }
+        if (files.length > 10) {
+            toast.error("You can only upload up to 10 files at once.");
+            return;
+        }
+
+        setIsUploading(true);
+        startTransition(async () => {
+            try {
+                // This function must be implemented similarly to `uploadStoreImage`.
+                // For each file, you can set alt text = file.name on the server side.
+                await uploadStoreImagesBulk(formData);
+
+                toast.success("Bulk uploaded successfully!");
+                router.refresh();
+
+                // Reset the bulk form
+                bulkFormRef.current?.reset();
+            } catch (err: any) {
+                toast.error(`Bulk upload failed: ${err.message}`);
             } finally {
                 setIsUploading(false);
             }
@@ -124,30 +168,58 @@ export default function StoreGalleryClient({ images }: Props) {
         <div className="p-4 space-y-4">
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold">Media Library</h1>
+                {/* Dialog with Tabs for Single / Bulk upload */}
                 <Dialog>
                     <DialogTrigger asChild>
                         <Button>Upload Image</Button>
                     </DialogTrigger>
+
                     <VisuallyHidden.Root>
                         <DialogTitle>Upload Image</DialogTitle>
-                    </VisuallyHidden.Root>
-                    <VisuallyHidden.Root>
                         <DialogDescription>Upload Image Dialog box</DialogDescription>
                     </VisuallyHidden.Root>
+
                     <DialogContent>
-                        <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <Label htmlFor="file">Select Image</Label>
-                                <Input id="file" type="file" name="file" required disabled={isUploading} />
-                            </div>
-                            <div>
-                                <Label htmlFor="imageAlt">Alt Text</Label>
-                                <Input id="imageAlt" type="text" name="imageAlt" required disabled={isUploading} />
-                            </div>
-                            <Button type="submit" disabled={isUploading}>
-                                {isUploading ? "Uploading..." : "Upload"}
-                            </Button>
-                        </form>
+                        <Tabs defaultValue="single" className="space-y-4">
+                            <TabsList>
+                                <TabsTrigger value="single">Single Upload</TabsTrigger>
+                                <TabsTrigger value="bulk">Bulk Upload</TabsTrigger>
+                            </TabsList>
+
+                            {/* SINGLE UPLOAD TAB */}
+                            <TabsContent value="single">
+                                <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+                                    <div>
+                                        <Label htmlFor="file">Select Image</Label>
+                                        <Input
+                                            id="file"
+                                            type="file"
+                                            name="file"
+                                            required
+                                            disabled={isUploading}
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="imageAlt">Alt Text</Label>
+                                        <Input
+                                            id="imageAlt"
+                                            type="text"
+                                            name="imageAlt"
+                                            required
+                                            disabled={isUploading}
+                                        />
+                                    </div>
+                                    <Button type="submit" disabled={isUploading}>
+                                        {isUploading ? "Uploading..." : "Upload"}
+                                    </Button>
+                                </form>
+                            </TabsContent>
+
+                            {/* BULK UPLOAD TAB */}
+                            <TabsContent value="bulk">
+                                <BulkUploader onSubmit={uploadStoreImagesBulk} maxFiles={10} />
+                            </TabsContent>
+                        </Tabs>
                     </DialogContent>
                 </Dialog>
             </div>

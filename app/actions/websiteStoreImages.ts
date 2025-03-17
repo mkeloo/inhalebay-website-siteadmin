@@ -86,3 +86,69 @@ export async function updateSortOrder(items: Array<{ id: number; sort: number }>
     );
     await Promise.all(promises);
 }
+
+// In websiteStoreImages.ts
+export async function uploadStoreImagesBulk(formData: FormData): Promise<void> {
+    const supabase = await createClient();
+    const rawFiles = formData.getAll("files") as File[];
+
+    if (!rawFiles.length) {
+        throw new Error("No files provided for bulk upload.");
+    }
+
+    // Fetch current max sort value
+    const { data: currentImages, error: fetchError } = await supabase
+        .from("website_store_images")
+        .select("sort")
+        .order("sort", { ascending: false })
+        .limit(1);
+    if (fetchError) throw fetchError;
+
+    let baseSort = 0;
+    if (currentImages && currentImages.length > 0) {
+        baseSort = currentImages[0].sort;
+    }
+
+    // For each file, also read the matching alt text
+    for (let i = 0; i < rawFiles.length; i++) {
+        const file = rawFiles[i];
+        console.log("Uploading file:", file.name, file.size);
+
+        try {
+            const altKey = `alt-${i}`;
+            const altText = (formData.get(altKey) as string) || file.name;
+            const baseTimestamp = Date.now();
+            const filePath = `store-gallery-images/${baseTimestamp}-${i}-${file.name}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from("inhale-bay-website")
+                .upload(filePath, file);
+
+            if (uploadError) {
+                console.error("Upload failed for file:", file.name, uploadError);
+                throw uploadError;
+            }
+
+            const { error: insertError } = await supabase
+                .from("website_store_images")
+                .insert([
+                    {
+                        image_src: `/${filePath}`,
+                        image_alt: altText,
+                        sort: baseSort + i + 1,
+                    },
+                ]);
+
+            if (insertError) {
+                console.error("DB insert failed for file:", file.name, insertError);
+                throw insertError;
+            }
+
+            console.log("File uploaded + inserted successfully:", file.name);
+        } catch (err) {
+            console.error("Bulk upload error for file:", file.name, err);
+            throw err;
+        }
+    }
+
+}
