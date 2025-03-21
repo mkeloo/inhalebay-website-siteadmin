@@ -23,6 +23,7 @@ import {
     deleteVapeDeal,
     fetchMediaBucketUrl,
     VapeDeal,
+    updateSortOrder,
 } from "../../../actions/vapesDeals";
 
 import { Button } from "@/components/ui/button";
@@ -50,11 +51,17 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, GripVertical } from "lucide-react";
+
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import { SortableContext, arrayMove, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export default function VapesDealsPage() {
     const [data, setData] = useState<VapeDeal[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isSortMode, setIsSortMode] = useState(false);
+
 
     // Table states
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -147,6 +154,7 @@ export default function VapesDealsPage() {
         },
         initialState: {
             pagination: { pageSize },
+            sorting: [{ id: "sort", desc: false }],
         },
     });
 
@@ -252,76 +260,100 @@ export default function VapesDealsPage() {
         setIsDeleteDialogOpen(false);
     }
 
+    const handleDragEnd = async (event: any) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+
+        // Reorder the local array
+        const oldIndex = data.findIndex(item => item.id === active.id);
+        const newIndex = data.findIndex(item => item.id === over.id);
+        const reordered = arrayMove(data, oldIndex, newIndex);
+
+        // Assign new sort values in ascending order (starting at 1)
+        reordered.forEach((deal, idx) => {
+            deal.sort = idx + 1;
+        });
+        setData(reordered);
+
+        // Update sort order in Supabase by passing an array of { id, sort } objects
+        try {
+            await updateSortOrder(reordered.map(deal => ({ id: deal.id, sort: deal.sort ?? 0 })));
+        } catch (err) {
+            console.error("Failed to update sort order", err);
+        }
+    };
+
     return (
         <div className="w-full max-w-[1200px] mx-auto">
             {/* Header */}
             <Card className="w-full flex flex-row items-center justify-between gap-4 px-6 py-4 mb-4">
                 <h1 className="text-2xl font-semibold">Vape Deals</h1>
-                <Button onClick={openCreateDialog}>Create Deal</Button>
+                <div className="flex gap-4">
+                    <Button onClick={() => setIsSortMode(!isSortMode)}>Sort Order</Button>
+                    <Button onClick={openCreateDialog}>Create Deal</Button>
+                </div>
             </Card>
 
             {/* Table */}
             <div className="w-full overflow-x-auto rounded-md border h-[600px]">
-                <Table className="table-fixed w-full">
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    const canResize = header.column.getCanResize();
-                                    const isResizing = header.column.getIsResizing();
-                                    return (
-                                        <TableHead
-                                            key={header.id}
-                                            style={{ width: header.getSize() }}
-                                            className="whitespace-nowrap overflow-hidden relative"
-                                        >
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(header.column.columnDef.header, header.getContext())}
-                                            {canResize && (
-                                                <div
-                                                    onMouseDown={header.getResizeHandler()}
-                                                    onTouchStart={header.getResizeHandler()}
-                                                    className={`absolute right-0 top-0 h-full w-2 cursor-col-resize select-none bg-transparent ${isResizing ? "bg-blue-500 opacity-40" : ""
-                                                        }`}
-                                                />
-                                            )}
-                                        </TableHead>
-                                    );
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {loading ? (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    Loading...
-                                </TableCell>
-                            </TableRow>
-                        ) : table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell
-                                            key={cell.id}
-                                            style={{ width: cell.column.getSize() }}
-                                            className="whitespace-nowrap overflow-hidden text-ellipsis"
-                                        >
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext
+                        items={data.map((deal) => deal.id)}
+                        strategy={verticalListSortingStrategy}
+                    >
+                        <Table className="table-auto w-full">
+                            <TableHeader className="">
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <TableRow key={headerGroup.id}>
+                                        {headerGroup.headers.map((header) => {
+                                            const canResize = header.column.getCanResize();
+                                            const isResizing = header.column.getIsResizing();
+                                            return (
+                                                <TableHead
+                                                    key={header.id}
+                                                    style={{ width: header.getSize() }}
+                                                    className="whitespace-nowrap overflow-hidden relative"
+                                                >
+                                                    {header.isPlaceholder
+                                                        ? null
+                                                        : flexRender(header.column.columnDef.header, header.getContext())}
+                                                    {canResize && (
+                                                        <div
+                                                            onMouseDown={header.getResizeHandler()}
+                                                            onTouchStart={header.getResizeHandler()}
+                                                            className={`absolute right-0 top-0 h-full w-2 cursor-col-resize select-none bg-transparent ${isResizing ? "bg-blue-500 opacity-40" : ""
+                                                                }`}
+                                                        />
+                                                    )}
+                                                </TableHead>
+                                            );
+                                        })}
+                                    </TableRow>
+                                ))}
+                            </TableHeader>
+                            <TableBody>
+                                {loading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={columns.length} className="h-24 text-center">
+                                            Loading...
                                         </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                                    </TableRow>
+                                ) : table.getRowModel().rows?.length ? (
+                                    table.getRowModel().rows.map((row) => (
+                                        // Use your custom SortableRow instead of a plain TableRow
+                                        <SortableRow key={row.id} row={row} isSortMode={isSortMode} />
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={columns.length} className="h-24 text-center">
+                                            No results.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </SortableContext>
+                </DndContext>
             </div>
 
             {/* Pagination */}
@@ -334,6 +366,7 @@ export default function VapesDealsPage() {
                     Next
                 </Button>
             </div>
+
 
             {/* CREATE DEAL DIALOG */}
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
@@ -538,5 +571,57 @@ export default function VapesDealsPage() {
                 </DialogContent>
             </Dialog>
         </div>
+    );
+}
+
+
+
+function SortableRow({
+    row,
+    isSortMode,
+}: {
+    row: ReturnType<
+        ReturnType<typeof useReactTable>["getRowModel"]
+    >["rows"][number];
+    isSortMode: boolean;
+}) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+        id: (row.original as VapeDeal).id,
+    });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
+    return (
+        <TableRow ref={setNodeRef} style={style} {...attributes}>
+            {row.getVisibleCells().map((cell) => {
+                // If this is the “select” column, either show the normal checkbox or a drag handle
+                if (cell.column.id === "select") {
+                    return (
+                        <TableCell key={cell.id}>
+                            {isSortMode ? (
+                                <div
+                                    className="cursor-grab text-gray-600 flex items-center justify-end"
+                                    {...listeners}
+                                >
+                                    <GripVertical className="w-6 h-6 ml-1" />
+                                </div>
+                            ) : (
+                                flexRender(cell.column.columnDef.cell, cell.getContext())
+                            )}
+                        </TableCell>
+                    );
+                }
+
+                // Otherwise, render the cell normally
+                return (
+                    <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                );
+            })}
+        </TableRow>
     );
 }

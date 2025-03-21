@@ -31,7 +31,7 @@ export function createVapeDealColumns({
         {
             id: "select",
             header: ({ table }) => (
-                <div className="text-center">
+                <div className="w-10 text-center">
                     <Checkbox
                         checked={
                             table.getIsAllPageRowsSelected() ||
@@ -45,7 +45,7 @@ export function createVapeDealColumns({
                 </div>
             ),
             cell: ({ row }) => (
-                <div className="text-center">
+                <div className="w-10 text-center">
                     <Checkbox
                         checked={row.getIsSelected()}
                         onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -55,11 +55,10 @@ export function createVapeDealColumns({
             ),
             enableSorting: false,
             enableHiding: false,
-            size: 50,
         },
-        // ID column
+        // NEW: Sort column
         {
-            accessorKey: "id",
+            accessorKey: "sort",
             header: ({ column }) => (
                 <div className="text-center">
                     <Button
@@ -68,14 +67,17 @@ export function createVapeDealColumns({
                             column.toggleSorting(column.getIsSorted() === "asc")
                         }
                     >
-                        ID
+                        Sort
                         <ArrowUpDown className="ml-2" />
                     </Button>
                 </div>
             ),
-            cell: ({ row }) => <div className="text-center">{row.getValue("id")}</div>,
+            cell: ({ row }) => <div className="text-center">{row.getValue("sort")}</div>,
             size: 80,
         },
+
+
+
         // Vape Company column
         {
             accessorKey: "vape_company",
@@ -97,6 +99,27 @@ export function createVapeDealColumns({
             ),
             size: 150,
         },
+
+        // ID column
+        {
+            accessorKey: "id",
+            header: ({ column }) => (
+                <div className="text-center">
+                    <Button
+                        variant="ghost"
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
+                    >
+                        ID
+                        <ArrowUpDown className="ml-2" />
+                    </Button>
+                </div>
+            ),
+            cell: ({ row }) => <div className="text-center">{row.getValue("id")}</div>,
+            size: 40,
+        },
+
         // Buy 1 Price column
         {
             accessorKey: "buy_1_price",
@@ -243,6 +266,9 @@ export function createVapeDealColumns({
             cell: ({ row }) => <div className="text-center">{row.getValue("bg_gradient")}</div>,
             size: 120,
         },
+
+
+
         // Created At column
         {
             accessorKey: "created_at",

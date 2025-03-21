@@ -29,19 +29,21 @@ export function createHempFlowerDealsColumns({
         {
             id: "select",
             header: ({ table }) => (
-                <div className="text-center">
+                <div className="w-10 text-center">
                     <Checkbox
                         checked={
                             table.getIsAllPageRowsSelected() ||
                             (table.getIsSomePageRowsSelected() && "indeterminate")
                         }
-                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                        onCheckedChange={(value) =>
+                            table.toggleAllPageRowsSelected(!!value)
+                        }
                         aria-label="Select all"
                     />
                 </div>
             ),
             cell: ({ row }) => (
-                <div className="text-center">
+                <div className="w-10 text-center">
                     <Checkbox
                         checked={row.getIsSelected()}
                         onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -51,11 +53,10 @@ export function createHempFlowerDealsColumns({
             ),
             enableSorting: false,
             enableHiding: false,
-            size: 50,
         },
-        // ID column
+        // NEW: Sort column
         {
-            accessorKey: "id",
+            accessorKey: "sort",
             header: ({ column }) => (
                 <div className="text-center">
                     <Button
@@ -64,14 +65,16 @@ export function createHempFlowerDealsColumns({
                             column.toggleSorting(column.getIsSorted() === "asc")
                         }
                     >
-                        ID
+                        Sort
                         <ArrowUpDown className="ml-2" />
                     </Button>
                 </div>
             ),
-            cell: ({ row }) => <div className="text-center">{row.getValue("id")}</div>,
+            cell: ({ row }) => <div className="text-center">{row.getValue("sort")}</div>,
             size: 80,
         },
+
+
         // Bud Name column
         {
             accessorKey: "bud_name",
@@ -92,6 +95,26 @@ export function createHempFlowerDealsColumns({
                 <div className="text-center">{row.getValue("bud_name")}</div>
             ),
             size: 150,
+        },
+
+        // ID column
+        {
+            accessorKey: "id",
+            header: ({ column }) => (
+                <div className="text-center">
+                    <Button
+                        variant="ghost"
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
+                    >
+                        ID
+                        <ArrowUpDown className="ml-2" />
+                    </Button>
+                </div>
+            ),
+            cell: ({ row }) => <div className="text-center">{row.getValue("id")}</div>,
+            size: 80,
         },
         // One Gram Price column
         {

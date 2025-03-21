@@ -18,7 +18,34 @@ export type VapeDeal = {
     created_at?: string;
     updated_at?: string;
     option_name?: string;
+    is_enabled?: boolean;
+    sort?: number;
 };
+
+/* -----------------------------
+   Update sort order after drag-and-drop
+------------------------------ */
+export async function updateSortOrder(items: Array<{ id: number; sort: number }>) {
+    const supabase = await createClient();
+    const promises = items.map(item =>
+        supabase
+            .from("website_vape_deals")
+            .update({ sort: item.sort })
+            .eq("id", item.id)
+    );
+
+    const results = await Promise.allSettled(promises);
+    results.forEach((result, index) => {
+        if (result.status === "rejected") {
+            console.error(`Failed to update sort for id ${items[index].id}:`, result.reason);
+        } else {
+            const { error } = result.value;
+            if (error) {
+                console.error(`Failed to update sort for id ${items[index].id}:`, error);
+            }
+        }
+    });
+}
 
 /* ---------------------------------------------
    1) Fetch the media bucket URL (option_value) 
@@ -51,7 +78,7 @@ export async function fetchVapeDeals(): Promise<{
         const { data, error } = await supabase
             .from("website_vape_deals")
             .select("*")
-            .order("id", { ascending: false });
+            .order("sort", { ascending: true });
         if (error) throw error;
         return { success: true, data: data as VapeDeal[] };
     } catch (err: any) {
