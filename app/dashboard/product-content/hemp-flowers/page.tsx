@@ -56,11 +56,17 @@ import { ArrowUpDown, GripVertical } from "lucide-react";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, arrayMove, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function HempFlowerDealsPage() {
     const [data, setData] = useState<FlowerBudDeal[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [isSortMode, setIsSortMode] = useState(false);
+
+    // Pagination state
+    // const pageSize = 10; // Number of rows per page
+    const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+
 
     // Table states
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -92,14 +98,6 @@ export default function HempFlowerDealsPage() {
     const [editFourGramPrice, setEditFourGramPrice] = useState("");
     const [editBgGradient, setEditBgGradient] = useState("");
     const [editFile, setEditFile] = useState<File | null>(null);
-
-    // Pagination state
-    const [page, setPage] = useState<number>(1);
-    const pageSize = 20;
-    // Compute total pages
-    const totalPages = Math.ceil(data.length / pageSize);
-    const isFirstPage = page === 1;
-    const isLastPage = page === totalPages;
 
 
     // Fetch all deals and media base URL on mount
@@ -145,9 +143,10 @@ export default function HempFlowerDealsPage() {
             columnFilters,
             columnVisibility,
             rowSelection,
+            pagination, // pass the pagination state here
         },
+        onPaginationChange: setPagination, // update the pagination state when it changes
         initialState: {
-            pagination: { pageSize },
             sorting: [{ id: "sort", desc: false }],
         },
     });
@@ -271,6 +270,25 @@ export default function HempFlowerDealsPage() {
             <Card className="w-full flex flex-row items-center justify-between gap-4 px-6 py-4 mb-4">
                 <h1 className="text-2xl font-semibold">Flower Bud Deals</h1>
                 <div className="flex gap-4">
+                    {/* Page Size Dropdown */}
+                    <Select
+                        value={String(pagination.pageSize)}
+                        onValueChange={(val) => {
+                            const newPageSize = Number(val);
+                            setPagination({ pageIndex: 0, pageSize: newPageSize });
+                        }}
+                    >
+                        <SelectTrigger className="w-[100px]">
+                            <SelectValue placeholder="Page size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="10">10</SelectItem>
+                            <SelectItem value="20">20</SelectItem>
+                            <SelectItem value="30">30</SelectItem>
+                            <SelectItem value="40">40</SelectItem>
+                            <SelectItem value="50">50</SelectItem>
+                        </SelectContent>
+                    </Select>
                     <Button onClick={() => setIsSortMode(!isSortMode)}>Sort Order</Button>
                     <Button onClick={openCreateDialog}>Create Deal</Button>
                 </div>
@@ -283,68 +301,84 @@ export default function HempFlowerDealsPage() {
                         items={data.map((deal) => deal.id)}
                         strategy={verticalListSortingStrategy}
                     >
-                        <Table className="table-auto w-full">
-                            <TableHeader>
-                                {table.getHeaderGroups().map((headerGroup) => (
-                                    <TableRow key={headerGroup.id}>
-                                        {headerGroup.headers.map((header) => {
-                                            const canResize = header.column.getCanResize();
-                                            const isResizing = header.column.getIsResizing();
-                                            return (
-                                                <TableHead
-                                                    key={header.id}
-                                                    style={{ width: header.getSize() }}
-                                                    className="whitespace-nowrap overflow-hidden relative"
-                                                >
-                                                    {header.isPlaceholder
-                                                        ? null
-                                                        : flexRender(header.column.columnDef.header, header.getContext())}
-                                                    {canResize && (
-                                                        <div
-                                                            onMouseDown={header.getResizeHandler()}
-                                                            onTouchStart={header.getResizeHandler()}
-                                                            className={`absolute right-0 top-0 h-full w-2 cursor-col-resize select-none bg-transparent ${isResizing ? "bg-blue-500 opacity-40" : ""
-                                                                }`}
-                                                        />
-                                                    )}
-                                                </TableHead>
-                                            );
-                                        })}
-                                    </TableRow>
-                                ))}
-                            </TableHeader>
-                            <TableBody>
-                                {loading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={columns.length} className="h-24 text-center">
-                                            Loading...
-                                        </TableCell>
-                                    </TableRow>
-                                ) : table.getRowModel().rows?.length ? (
-                                    table.getRowModel().rows.map((row) => (
-                                        // Use your custom SortableRow instead of a plain TableRow
-                                        <SortableRow key={row.id} row={row} isSortMode={isSortMode} />
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={columns.length} className="h-24 text-center">
-                                            No results.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+
+                        <div className="w-full h-[600px] overflow-y-auto block">
+                            <Table className="table-auto w-full">
+                                <TableHeader className="sticky top-0 z-10">
+                                    {table.getHeaderGroups().map((headerGroup) => (
+                                        <TableRow key={headerGroup.id}>
+                                            {headerGroup.headers.map((header) => {
+                                                const canResize = header.column.getCanResize();
+                                                const isResizing = header.column.getIsResizing();
+                                                return (
+                                                    <TableHead
+                                                        key={header.id}
+                                                        style={{ width: header.getSize() }}
+                                                        className="whitespace-nowrap overflow-hidden relative"
+                                                    >
+                                                        {header.isPlaceholder
+                                                            ? null
+                                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                                        {canResize && (
+                                                            <div
+                                                                onMouseDown={header.getResizeHandler()}
+                                                                onTouchStart={header.getResizeHandler()}
+                                                                className={`absolute right-0 top-0 h-full w-2 cursor-col-resize select-none bg-transparent ${isResizing ? "bg-blue-500 opacity-40" : ""
+                                                                    }`}
+                                                            />
+                                                        )}
+                                                    </TableHead>
+                                                );
+                                            })}
+                                        </TableRow>
+                                    ))}
+                                </TableHeader>
+                                <TableBody>
+                                    {loading ? (
+                                        <TableRow>
+                                            <TableCell colSpan={columns.length} className="h-24 text-center">
+                                                Loading...
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : table.getRowModel().rows?.length ? (
+                                        table.getRowModel().rows.map((row) => (
+                                            // Use your custom SortableRow instead of a plain TableRow
+                                            <SortableRow key={row.id} row={row} isSortMode={isSortMode} />
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={columns.length} className="h-24 text-center">
+                                                No results.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+
+                        </div>
+
+
                     </SortableContext>
                 </DndContext>
             </div>
 
             {/* Pagination */}
             <div className="flex justify-between items-center mt-4">
-                <Button variant="outline" disabled={isFirstPage} onClick={() => setPage((prev) => Math.max(prev - 1, 1))}>
+                <Button
+                    variant="outline"
+                    disabled={pagination.pageIndex === 0}
+                    onClick={() => table.setPageIndex(pagination.pageIndex - 1)}
+                >
                     Previous
                 </Button>
-                <span className="text-lg font-medium">Page {page}</span>
-                <Button variant="outline" disabled={isLastPage} onClick={() => setPage((prev) => prev + 1)}>
+                <span className="text-lg font-medium">
+                    Page {pagination.pageIndex + 1} of {table.getPageCount()}
+                </span>
+                <Button
+                    variant="outline"
+                    disabled={pagination.pageIndex + 1 >= table.getPageCount()}
+                    onClick={() => table.setPageIndex(pagination.pageIndex + 1)}
+                >
                     Next
                 </Button>
             </div>
