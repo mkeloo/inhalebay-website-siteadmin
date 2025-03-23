@@ -201,7 +201,7 @@ export default function HempLabelMaker() {
 
             {/* LABEL PREVIEW CONTAINER */}
             <div className="w-full overflow-auto flex flex-col items-center justify-center gap-4 border md:p-4 rounded-lg">
-                <h2 className="text-2xl lg:text-3xl font-semibold mb-2 text-center">Label Preview</h2>
+                <h2 className="text-2xl lg:text-3xl font-semibold mb-2 text-center my-4">Label Preview</h2>
 
                 {/* ZOOM CONTROLS */}
                 <div className="flex gap-4 items-center">
@@ -212,7 +212,7 @@ export default function HempLabelMaker() {
                 </div>
 
                 <div
-                    className="w-full flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-10 rounded-2xl p-4 lg:p-10 overflow-auto"
+                    className="w-full flex flex-col md:flex-row items-center justify-center gap-4 lg:gap-10 rounded-2xl p-4 lg:p-10 overflow-auto"
                     style={{
                         backgroundColor: "rgba(0, 0, 0, 0.8)",
                     }}
