@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -10,10 +10,10 @@ import { coaBaseURL, hempCOA } from "@/lib/index";
 import { fetchAllHempLabCertificates, fetchCertificatesURL, HempLabCertificates } from "../../../actions/hempLabCOA";
 import { QRCode } from "react-qrcode-logo";
 import inhalebaylogo from "@/assets/InhaleBayLogo.svg";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 
-// Number of items per page
-const ITEMS_PER_PAGE = 13;
 
 export default function HempCertificateOfAnalysis() {
     const [certificates, setCertificates] = useState<HempLabCertificates[]>([]);
@@ -23,9 +23,13 @@ export default function HempCertificateOfAnalysis() {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedFile, setSelectedFile] = useState<string | null>(null);
     const [qrCodeData, setQrCodeData] = useState<string | null>(null);
+    const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [thcaFilter, setThcaFilter] = useState<string>("All");
 
     useEffect(() => {
         async function fetchData() {
+            setLoading(true);
             const certRes = await fetchAllHempLabCertificates();
             if (certRes.success) {
                 setCertificates(certRes.data);
@@ -38,24 +42,33 @@ export default function HempCertificateOfAnalysis() {
                 setCertificatesURL(url);
             } catch (err: any) {
                 setError(err.message);
+            } finally {
+                setLoading(false);
             }
         }
 
         fetchData();
     }, []);
 
-    // Calculate total pages
-    const totalPages = Math.ceil(certificates.length / ITEMS_PER_PAGE);
+    const filteredCertificates = certificates.filter(cert => {
+        const matchesSearch = cert.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesFilter =
+            thcaFilter === "All" || cert.name.includes(thcaFilter);
+        return matchesSearch && matchesFilter;
+    });
 
-    const paginatedCertificates = certificates.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+    // Calculate total pages
+    const totalPages = Math.ceil(filteredCertificates.length / itemsPerPage);
+    const paginatedCertificates = filteredCertificates.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
+
 
     // Generate QR Code
     const generateQRCode = () => {
         if (!selectedFile) return;
-        setQrCodeData(`${coaBaseURL}${selectedFile}`);
+        setQrCodeData(`${certificatesURL}${selectedFile}`);
     };
 
     // Copy QR Code URL to clipboard
@@ -86,6 +99,53 @@ export default function HempCertificateOfAnalysis() {
             <Card className="w-full p-6 max-w-[1200px] mx-auto">
                 <h2 className="text-xl font-semibold mb-4">Hemp Certificate of Analysis</h2>
 
+                {/* Search and Filters */}
+                <Card className="w-full p-4 max-w-[1200px]">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <Input
+                            placeholder="Search Certificates..."
+                            value={searchQuery}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                setSearchQuery(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                            className="md:w-64"
+                        />
+
+                        <div className="flex flex-row gap-4 items-center">
+                            {/* THCA Filter Dropdown */}
+                            <Select value={thcaFilter} onValueChange={(val) => {
+                                setThcaFilter(val);
+                                setCurrentPage(1);
+                            }}>
+                                <SelectTrigger className="w-[200px]">
+                                    <SelectValue placeholder="Filter by THCA" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="All">All</SelectItem>
+                                    <SelectItem value="THCA Flower">THCA Flower</SelectItem>
+                                    <SelectItem value="THCA Snowcaps">THCA Snowcaps</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            {/* Items Per Page Dropdown */}
+                            <Select value={`${itemsPerPage}`} onValueChange={(val) => {
+                                setItemsPerPage(Number(val));
+                                setCurrentPage(1);
+                            }}>
+                                <SelectTrigger className="w-[150px]">
+                                    <SelectValue placeholder="Items per page" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {[10, 20, 30, 40, 50].map((num) => (
+                                        <SelectItem key={num} value={`${num}`}>{num} per page</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </Card>
+
                 <div className="w-full overflow-x-auto rounded-md border">
                     <Table className="table-auto w-full mb-4 mx-4">
                         <TableHeader>
@@ -101,27 +161,41 @@ export default function HempCertificateOfAnalysis() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {paginatedCertificates.map((cert) => (
-                                <TableRow key={cert.id}>
-                                    <TableCell className="border-r truncate">{cert.serial_id}</TableCell>
-                                    <TableCell className="border-r truncate">{cert.name}</TableCell>
-                                    <TableCell className="border-r truncate">{cert.file_name}</TableCell>
-                                    <TableCell className="border-r text-center">
-                                        <a
-                                            href={`${certificatesURL}${cert.file_url}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 hover:underline"
-                                        >
-                                            View PDF
-                                        </a>
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={8} className="text-center py-4 text-gray-500">
+                                        Loading...
                                     </TableCell>
-                                    <TableCell className="border-r">{cert.file_type}</TableCell>
-                                    <TableCell className="border-r">{cert.file_size_kb.toFixed(2)} KB</TableCell>
-                                    <TableCell className="border-r">{new Date(cert.created_at || "").toLocaleString()}</TableCell>
-                                    <TableCell className="border-r">{new Date(cert.updated_at || "").toLocaleString()}</TableCell>
                                 </TableRow>
-                            ))}
+                            ) : paginatedCertificates.length > 0 ? (
+                                paginatedCertificates.map((cert) => (
+                                    <TableRow key={cert.id}>
+                                        <TableCell className="border-r truncate">{cert.serial_id}</TableCell>
+                                        <TableCell className="border-r truncate">{cert.name}</TableCell>
+                                        <TableCell className="border-r truncate">{cert.file_name}</TableCell>
+                                        <TableCell className="border-r text-center">
+                                            <a
+                                                href={`${certificatesURL}${cert.file_url}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:underline"
+                                            >
+                                                View PDF
+                                            </a>
+                                        </TableCell>
+                                        <TableCell className="border-r">{cert.file_type}</TableCell>
+                                        <TableCell className="border-r">{cert.file_size_kb.toFixed(2)} KB</TableCell>
+                                        <TableCell className="border-r">{new Date(cert.created_at || "").toLocaleString()}</TableCell>
+                                        <TableCell className="border-r">{new Date(cert.updated_at || "").toLocaleString()}</TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={8} className="text-center py-4 text-gray-500">
+                                        No Certificates Found.
+                                    </TableCell>
+                                </TableRow>
+                            )}
                         </TableBody>
                     </Table>
                 </div>
@@ -183,11 +257,7 @@ export default function HempCertificateOfAnalysis() {
                         {/* Fixed Button */}
                         <Button
                             className="mt-4 w-full"
-                            onClick={() => {
-                                if (selectedFile) {
-                                    setQrCodeData(`${certificatesURL}${selectedFile}`);
-                                }
-                            }}
+                            onClick={generateQRCode}
                             disabled={!selectedFile}
                         >
                             Generate
