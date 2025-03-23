@@ -15,6 +15,8 @@ import {
 } from "@tanstack/react-table";
 
 import { createVapeDealColumns } from "./columns";
+import { generateRandomGradient } from "@/lib/functions";
+
 import {
     fetchVapeDeals,
     fetchVapeDealById,
@@ -97,7 +99,7 @@ export default function VapesDealsPage() {
     const [newDiscount, setNewDiscount] = useState("");
     const [newTagline, setNewTagline] = useState("");
     const [newShortTitle, setNewShortTitle] = useState("");
-    const [newBgGradient, setNewBgGradient] = useState("");
+    const [newBgGradient, setNewBgGradient] = useState(generateRandomGradient());
     const [newFile, setNewFile] = useState<File | null>(null);
 
     // States for updating an existing deal (used in the sheet)
@@ -152,6 +154,20 @@ export default function VapesDealsPage() {
 
         setIsCreating(false); // set loading state to false
     }
+
+    // ========== CREATE NEW DEAL ==========
+    function openCreateDialog() {
+        setNewCompany("");
+        setNewBuy1("");
+        setNewBuy2("");
+        setNewDiscount("");
+        setNewTagline("");
+        setNewShortTitle("");
+        setNewBgGradient(generateRandomGradient()); // <-- Randomly generate on each open
+        setNewFile(null);
+        setIsCreateDialogOpen(true);
+    }
+
 
     // ========== EDIT DEAL (SHEET) ==========
     async function handleEditDeal(dealId: number) {
@@ -262,19 +278,6 @@ export default function VapesDealsPage() {
             sorting: [{ id: "sort", desc: false }],
         },
     });
-
-    // ========== CREATE NEW DEAL ==========
-    function openCreateDialog() {
-        setNewCompany("");
-        setNewBuy1("");
-        setNewBuy2("");
-        setNewDiscount("");
-        setNewTagline("");
-        setNewShortTitle("");
-        setNewBgGradient("");
-        setNewFile(null);
-        setIsCreateDialogOpen(true);
-    }
 
     async function handleToggleEnabled(id: number, enabled: boolean) {
         setData(prevData => prevData.map(deal =>

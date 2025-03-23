@@ -15,6 +15,8 @@ import {
 } from "@tanstack/react-table";
 
 import { createHempFlowerDealsColumns } from "./columns";
+import { generateRandomGradient } from "@/lib/functions";
+
 import {
     fetchFlowerBudDeals,
     fetchFlowerBudDealById,
@@ -94,7 +96,7 @@ export default function HempFlowerDealsPage() {
     const [newBudName, setNewBudName] = useState("");
     const [newOneGramPrice, setNewOneGramPrice] = useState("");
     const [newFourGramPrice, setNewFourGramPrice] = useState("");
-    const [newBgGradient, setNewBgGradient] = useState("");
+    const [newBgGradient, setNewBgGradient] = useState(generateRandomGradient());
     const [newFile, setNewFile] = useState<File | null>(null);
 
     // States for updating an existing deal (used in the sheet)
@@ -143,6 +145,18 @@ export default function HempFlowerDealsPage() {
 
         setIsCreating(false); // set loading state to false
     }
+
+
+    // ========== CREATE NEW DEAL ==========
+    function openCreateDialog() {
+        setNewBudName("");
+        setNewOneGramPrice("");
+        setNewFourGramPrice("");
+        setNewBgGradient(generateRandomGradient()); // <-- Randomly generate on each open
+        setNewFile(null);
+        setIsCreateDialogOpen(true);
+    }
+
 
     // ========== EDIT DEAL (SHEET) ==========
     async function handleEditDeal(dealId: number) {
@@ -247,16 +261,6 @@ export default function HempFlowerDealsPage() {
             sorting: [{ id: "sort", desc: false }],
         },
     });
-
-    // ========== CREATE NEW DEAL ==========
-    function openCreateDialog() {
-        setNewBudName("");
-        setNewOneGramPrice("");
-        setNewFourGramPrice("");
-        setNewBgGradient("");
-        setNewFile(null);
-        setIsCreateDialogOpen(true);
-    }
 
 
     async function handleToggleEnabled(id: number, enabled: boolean) {
