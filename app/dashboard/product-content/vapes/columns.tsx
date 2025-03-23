@@ -2,7 +2,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { updateVapeDealEnabled, VapeDeal } from "../../../actions/vapesDeals";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -232,23 +231,11 @@ export function createVapeDealColumns({
                     </Button>
                 </div>
             ),
-            cell: ({ row }) => {
-                const enabled = row.getValue<boolean>("is_enabled");
-                return (
-                    <div className="text-center">
-                        <Switch
-                            checked={enabled}
-                            onCheckedChange={async (checked) => {
-                                const id = row.getValue<number>("id");
-                                const res = await updateVapeDealEnabled(id, checked);
-                                if (!res.success) {
-                                    alert("Failed to update status: " + res.error);
-                                }
-                            }}
-                        />
-                    </div>
-                );
-            },
+            cell: ({ row }) => (
+                <div className="text-center">
+                    {row.getValue<boolean>("is_enabled") ? "Enabled" : "Disabled"}
+                </div>
+            ),
             size: 80,
         },
 

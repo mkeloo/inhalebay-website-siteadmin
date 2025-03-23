@@ -24,6 +24,7 @@ import {
     fetchMediaBucketUrl,
     FlowerBudDeal,
     updateSortOrder,
+    updateFlowerBudDealEnabled,
 } from "../../../actions/hempFlowerDeals";
 
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, arrayMove, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 export default function HempFlowerDealsPage() {
     const [data, setData] = useState<FlowerBudDeal[]>([]);
@@ -241,6 +243,27 @@ export default function HempFlowerDealsPage() {
         setIsDeleteDialogOpen(false);
     }
 
+    async function handleToggleEnabled(id: number, enabled: boolean) {
+        setData(prevData => prevData.map(deal =>
+            deal.id === id ? { ...deal, is_enabled: enabled } : deal
+        ));
+
+        const res = await updateFlowerBudDealEnabled(id, enabled);
+        if (!res.success) {
+            alert("Failed to update status: " + res.error);
+
+            setData(prevData => prevData.map(deal =>
+                deal.id === id ? { ...deal, is_enabled: !enabled } : deal
+            ));
+            return;
+        }
+
+        const dealsRes = await fetchFlowerBudDeals();
+        if (dealsRes.success) {
+            setData(dealsRes.data);
+        }
+    }
+
     const handleDragEnd = async (event: any) => {
         const { active, over } = event;
         if (!over || active.id === over.id) return;
@@ -343,7 +366,7 @@ export default function HempFlowerDealsPage() {
                                     ) : table.getRowModel().rows?.length ? (
                                         table.getRowModel().rows.map((row) => (
                                             // Use your custom SortableRow instead of a plain TableRow
-                                            <SortableRow key={row.id} row={row} isSortMode={isSortMode} />
+                                            <SortableRow key={row.id} row={row} isSortMode={isSortMode} onToggleEnabled={handleToggleEnabled} />
                                         ))
                                     ) : (
                                         <TableRow>
@@ -542,11 +565,13 @@ export default function HempFlowerDealsPage() {
 function SortableRow({
     row,
     isSortMode,
+    onToggleEnabled,
 }: {
     row: ReturnType<
         ReturnType<typeof useReactTable>["getRowModel"]
     >["rows"][number];
     isSortMode: boolean;
+    onToggleEnabled: (id: number, enabled: boolean) => void;
 }) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
         id: (row.original as FlowerBudDeal).id,
@@ -560,8 +585,9 @@ function SortableRow({
     return (
         <TableRow ref={setNodeRef} style={style} {...attributes}>
             {row.getVisibleCells().map((cell) => {
-                // If this is the “select” column, either show the normal checkbox or a drag handle
-                if (cell.column.id === "select") {
+                const cellId = cell.column.id;
+
+                if (cellId === "select") {
                     return (
                         <TableCell key={cell.id}>
                             {isSortMode ? (
@@ -574,6 +600,20 @@ function SortableRow({
                             ) : (
                                 flexRender(cell.column.columnDef.cell, cell.getContext())
                             )}
+                        </TableCell>
+                    );
+                }
+
+                // Handle your toggle explicitly here
+                if (cellId === "is_enabled") {
+                    const enabled = row.getValue<boolean>("is_enabled");
+                    const id = row.getValue<number>("id");
+                    return (
+                        <TableCell key={cell.id} className="text-center">
+                            <Switch
+                                checked={enabled}
+                                onCheckedChange={(checked) => onToggleEnabled(id, checked)}
+                            />
                         </TableCell>
                     );
                 }
