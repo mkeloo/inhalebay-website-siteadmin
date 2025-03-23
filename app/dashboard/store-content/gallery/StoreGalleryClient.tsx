@@ -165,7 +165,7 @@ export default function StoreGalleryClient({ images }: Props) {
 
 
     return (
-        <div className="p-4 space-y-4 ">
+        <div className="p-0 lg:p-4 space-y-4 ">
             <div className="flex flex-col md:flex-row justify-between gap-y-4 items-center">
                 <h1 className="text-2xl font-bold">Media Library</h1>
                 {/* Dialog with Tabs for Single / Bulk upload */}
@@ -225,7 +225,7 @@ export default function StoreGalleryClient({ images }: Props) {
             </div>
 
             {mounted && (
-                <Card className="w-full h-full px-6 py-10 mt-4">
+                <Card className="w-full h-full px-2 lg:px-6 py-10 mt-4">
                     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                         <SortableContext items={imageList.map(i => i.id)} strategy={verticalListSortingStrategy}>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 lg:gap-x-6 gap-y-10">

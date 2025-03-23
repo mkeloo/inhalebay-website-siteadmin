@@ -335,7 +335,7 @@ export default function VapesDealsPage() {
             {/* Header */}
             <Card className="w-full flex flex-col lg:flex-row items-center justify-between gap-4 px-6 py-4 mb-4">
                 <h1 className="text-2xl font-semibold">Vape Deals</h1>
-                <div className="flex flex-wrap md:flex-row gap-4">
+                <div className="flex flex-wrap md:flex-row items-center justify-center gap-4">
                     {/* Page Size Dropdown */}
                     <Select
                         value={String(pagination.pageSize)}
