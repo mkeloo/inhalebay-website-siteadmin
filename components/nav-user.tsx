@@ -29,6 +29,8 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/components/ui/sidebar"
+import { signOut } from "@/app/actions/auth"
+import { redirect } from "next/navigation"
 
 export function NavUser({
     user,
@@ -39,6 +41,11 @@ export function NavUser({
     }
 }) {
     const { isMobile } = useSidebar()
+
+    const handleLogout = () => {
+        signOut()
+        redirect("/");
+    }
 
     return (
         <SidebarMenu>
@@ -77,7 +84,7 @@ export function NavUser({
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
+                        {/* <DropdownMenuGroup>
                             <DropdownMenuItem>
                                 <Sparkles />
                                 Upgrade to Pro
@@ -98,8 +105,8 @@ export function NavUser({
                                 Notifications
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuSeparator /> */}
+                        <DropdownMenuItem onClick={handleLogout}>
                             <LogOut />
                             Log out
                         </DropdownMenuItem>
