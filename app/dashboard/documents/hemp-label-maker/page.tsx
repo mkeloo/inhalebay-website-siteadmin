@@ -200,7 +200,7 @@ export default function HempLabelMaker() {
             </Card>
 
             {/* LABEL PREVIEW CONTAINER */}
-            <div className="w-full overflow-auto flex flex-col items-center justify-center gap-4 border md:p-4 rounded-lg">
+            <div className="w-full flex flex-col items-center justify-center gap-4 border md:p-4 rounded-lg">
                 <h2 className="text-2xl lg:text-3xl font-semibold mb-2 text-center my-4">Label Preview</h2>
 
                 {/* ZOOM CONTROLS */}
@@ -211,64 +211,110 @@ export default function HempLabelMaker() {
                     <Button variant="secondary" onClick={handleResetZoom}>Reset</Button>
                 </div>
 
-                <div
-                    className="w-full flex flex-col md:flex-row items-center justify-center gap-4 lg:gap-10 rounded-2xl p-4 lg:p-10 overflow-auto"
-                    style={{
-                        backgroundColor: "rgba(0, 0, 0, 0.8)",
-                    }}
-                >
-                    {/* FRONT LABEL */}
-                    <div
-                        className="flex-shrink-0 transition-transform"
-                        style={{ transform: `scale(${zoomLevel})`, transformOrigin: "top center" }}
-                    >
-                        <div className="flex flex-col items-center gap-y-2">
-                            <h1 className="text-lg md:text-xl lg:text-2xl text-center text-white font-bold">FRONT LABEL</h1>
-                            <Card ref={frontLabelRef} className="p-4 space-y-2 !rounded-none" style={styleFront}>
-                                <div className="flex justify-center items-center">
-                                    <img src={LOGO_PLACEHOLDER.src} alt="Logo" style={{ maxHeight: 40 }} />
-                                </div>
-                                <div className="text-center mt-2">
-                                    <h3 className="font-bold">{selectedProduct || "Product Name"}</h3>
-                                    <p>{productWeight}</p>
-                                </div>
-                                {generatedQR && (
-                                    <div className="absolute bottom-2 right-2">
-                                        <QRCode
-                                            value={generatedQR}
-                                            size={110}
-                                            ecLevel="H"
-                                            qrStyle="dots"
-                                            fgColor="#000000"
-                                            bgColor="#FFFFFF"
-                                            style={{ borderRadius: 10, border: "2px solid #000000" }}
-                                            quietZone={5}
-                                            eyeRadius={[
-                                                { outer: 12, inner: 4 },
-                                                { outer: 12, inner: 4 },
-                                                { outer: 12, inner: 4 },
-                                            ]}
-                                        />
+                {/* Outer container that can scroll */}
+                <div className="w-full  overflow-auto">
+                    {/* SCROLLABLE WRAPPER */}
+                    <div className="w-full overflow-x-auto h-[70vh]" style={{ backgroundColor: "rgba(0, 0, 0, 0.8)" }}>
+                        <div
+                            className="flex flex-row items-center justify-center p-4 mx-auto"
+                            style={{
+                                // Make sure there's enough total width for both scaled labels
+                                // + some extra buffer so user can scroll around at higher zoom
+                                minWidth: (labelWidth * INCH_TO_PX * zoomLevel + 100) * 2 + 200,
+                            }}
+                        >
+                            {/* FRONT LABEL WRAPPER */}
+                            <div
+                                className="relative"
+                                style={{
+                                    width: (labelWidth * INCH_TO_PX) * zoomLevel + 100,
+                                    height: (labelHeight * INCH_TO_PX) * zoomLevel + 100,
+                                }}
+                            >
+                                <div
+                                    className="absolute top-0"
+                                    style={{
+                                        width: labelWidth * INCH_TO_PX,
+                                        height: labelHeight * INCH_TO_PX,
+                                        left: "50%",
+                                        transform: `
+                                          translateX(-50%)
+                                          scale(${zoomLevel})
+                                        `,
+                                        transformOrigin: "top center",
+                                    }}
+                                >
+                                    <div className=" flex flex-col items-center gap-y-2">
+                                        <h1 className="text-lg md:text-xl lg:text-2xl text-center text-white font-bold">
+                                            FRONT LABEL
+                                        </h1>
+                                        <Card ref={frontLabelRef} className="p-4 space-y-2 !rounded-none" style={styleFront}>
+                                            <div className="flex justify-center items-center">
+                                                <img src={LOGO_PLACEHOLDER.src} alt="Logo" style={{ maxHeight: 40 }} />
+                                            </div>
+                                            <div className="text-center mt-2">
+                                                <h3 className="font-bold">{selectedProduct || "Product Name"}</h3>
+                                                <p>{productWeight}</p>
+                                            </div>
+                                            {generatedQR && (
+                                                <div className="absolute bottom-2 right-2">
+                                                    <QRCode
+                                                        value={generatedQR}
+                                                        size={110}
+                                                        ecLevel="H"
+                                                        qrStyle="dots"
+                                                        fgColor="#000000"
+                                                        bgColor="#FFFFFF"
+                                                        style={{ borderRadius: 10, border: "2px solid #000000" }}
+                                                        quietZone={5}
+                                                        eyeRadius={[
+                                                            { outer: 12, inner: 4 },
+                                                            { outer: 12, inner: 4 },
+                                                            { outer: 12, inner: 4 },
+                                                        ]}
+                                                    />
+                                                </div>
+                                            )}
+                                        </Card>
                                     </div>
-                                )}
-                            </Card>
-                        </div>
-                    </div>
+                                </div>
+                            </div>
 
-                    {/* BACK LABEL */}
-                    <div
-                        className="flex-shrink-0 transition-transform"
-                        style={{ transform: `scale(${zoomLevel})`, transformOrigin: "top center" }}
-                    >
-                        <div className="flex flex-col items-center gap-y-2">
-                            <h1 className="text-lg md:text-xl lg:text-2xl text-center text-white font-bold">BACK LABEL</h1>
-                            <Card ref={backLabelRef} className="p-4 space-y-2 !rounded-none" style={styleBack}>
-                                <h4 className="font-bold">Warnings:</h4>
-                                <p className="text-sm">{WARNINGS}</p>
-                                <p className="text-xs absolute bottom-2">
-                                    Hemp product. Keep away from children. For legal use only.
-                                </p>
-                            </Card>
+                            {/* BACK LABEL WRAPPER */}
+                            <div
+                                className="relative"
+                                style={{
+                                    width: (labelWidth * INCH_TO_PX) * zoomLevel + 100,
+                                    height: (labelHeight * INCH_TO_PX) * zoomLevel + 100,
+                                }}
+                            >
+                                <div
+                                    className="absolute top-0"
+                                    style={{
+                                        width: labelWidth * INCH_TO_PX,
+                                        height: labelHeight * INCH_TO_PX,
+                                        left: "50%",
+                                        transform: `
+                                          translateX(-50%)
+                                          scale(${zoomLevel})
+                                        `,
+                                        transformOrigin: "top center",
+                                    }}
+                                >
+                                    <div className="flex flex-col items-center gap-y-2">
+                                        <h1 className="text-lg md:text-xl lg:text-2xl text-center text-white font-bold">
+                                            BACK LABEL
+                                        </h1>
+                                        <Card ref={backLabelRef} className="p-4 space-y-2 !rounded-none" style={styleBack}>
+                                            <h4 className="font-bold">Warnings:</h4>
+                                            <p className="text-sm">{WARNINGS}</p>
+                                            <p className="text-xs absolute bottom-2">
+                                                Hemp product. Keep away from children. For legal use only.
+                                            </p>
+                                        </Card>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
