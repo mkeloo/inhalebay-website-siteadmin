@@ -26,34 +26,45 @@ export function createVapeDealColumns({
 
 
     return [
-        // SELECT (checkbox) column
+        // ID column
         {
-            id: "select",
-            header: ({ table }) => (
-                <div className="w-10 text-center">
-                    <Checkbox
-                        checked={
-                            table.getIsAllPageRowsSelected() ||
-                            (table.getIsSomePageRowsSelected() && "indeterminate")
+            accessorKey: "id",
+            header: ({ column }) => (
+                <div className="text-center">
+                    <Button
+                        variant="ghost"
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
                         }
-                        onCheckedChange={(value) =>
-                            table.toggleAllPageRowsSelected(!!value)
-                        }
-                        aria-label="Select all"
-                    />
+                    >
+                        ID
+                        <ArrowUpDown className="ml-2" />
+                    </Button>
+                </div>
+            ),
+            cell: ({ row }) => <div className="text-center">{row.getValue("id")}</div>,
+            size: 40,
+        },
+        // NEW: Enabled column
+        {
+            accessorKey: "is_enabled",
+            header: ({ column }) => (
+                <div className="text-center">
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        Enabled
+                        <ArrowUpDown className="ml-2" />
+                    </Button>
                 </div>
             ),
             cell: ({ row }) => (
-                <div className="w-10 text-center">
-                    <Checkbox
-                        checked={row.getIsSelected()}
-                        onCheckedChange={(value) => row.toggleSelected(!!value)}
-                        aria-label="Select row"
-                    />
+                <div className="text-center">
+                    {row.getValue<boolean>("is_enabled") ? "Enabled" : "Disabled"}
                 </div>
             ),
-            enableSorting: false,
-            enableHiding: false,
+            size: 80,
         },
         // NEW: Sort column
         {
@@ -99,25 +110,7 @@ export function createVapeDealColumns({
             size: 150,
         },
 
-        // ID column
-        {
-            accessorKey: "id",
-            header: ({ column }) => (
-                <div className="text-center">
-                    <Button
-                        variant="ghost"
-                        onClick={() =>
-                            column.toggleSorting(column.getIsSorted() === "asc")
-                        }
-                    >
-                        ID
-                        <ArrowUpDown className="ml-2" />
-                    </Button>
-                </div>
-            ),
-            cell: ({ row }) => <div className="text-center">{row.getValue("id")}</div>,
-            size: 40,
-        },
+
 
         // Buy 1 Price column
         {
@@ -216,27 +209,6 @@ export function createVapeDealColumns({
                 </div>
             ),
             size: 120,
-        },
-        // NEW: Enabled column
-        {
-            accessorKey: "is_enabled",
-            header: ({ column }) => (
-                <div className="text-center">
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        Enabled
-                        <ArrowUpDown className="ml-2" />
-                    </Button>
-                </div>
-            ),
-            cell: ({ row }) => (
-                <div className="text-center">
-                    {row.getValue<boolean>("is_enabled") ? "Enabled" : "Disabled"}
-                </div>
-            ),
-            size: 80,
         },
 
         // BG Gradient column

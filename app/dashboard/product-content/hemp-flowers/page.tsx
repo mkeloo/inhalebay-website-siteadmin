@@ -587,12 +587,12 @@ function SortableRow({
             {row.getVisibleCells().map((cell) => {
                 const cellId = cell.column.id;
 
-                if (cellId === "select") {
+                if (cellId === "id") {
                     return (
                         <TableCell key={cell.id}>
                             {isSortMode ? (
                                 <div
-                                    className="cursor-grab text-gray-600 flex items-center justify-end"
+                                    className="cursor-grab text-gray-600 flex items-center justify-center"
                                     {...listeners}
                                 >
                                     <GripVertical className="w-6 h-6 ml-1" />
