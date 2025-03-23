@@ -165,8 +165,8 @@ export default function StoreGalleryClient({ images }: Props) {
 
 
     return (
-        <div className="p-4 space-y-4">
-            <div className="flex justify-between items-center">
+        <div className="p-4 space-y-4 ">
+            <div className="flex flex-col md:flex-row justify-between gap-y-4 items-center">
                 <h1 className="text-2xl font-bold">Media Library</h1>
                 {/* Dialog with Tabs for Single / Bulk upload */}
                 <Dialog>

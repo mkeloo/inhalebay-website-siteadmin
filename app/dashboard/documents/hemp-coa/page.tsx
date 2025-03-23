@@ -96,8 +96,8 @@ export default function HempCertificateOfAnalysis() {
     return (
         <div className="w-full h-full flex flex-col items-center justify-start gap-6 pb-10">
             {/* Table */}
-            <Card className="w-full p-6 max-w-[1200px] mx-auto">
-                <h2 className="text-xl font-semibold mb-4">Hemp Certificate of Analysis</h2>
+            <Card className="w-full p-2 lg:p-6 max-w-[1200px] mx-auto">
+                <h2 className="text-xl font-semibold text-center lg:mb-4 py-4">Hemp Certificate of Analysis</h2>
 
                 {/* Search and Filters */}
                 <Card className="w-full p-4 max-w-[1200px]">
@@ -112,7 +112,7 @@ export default function HempCertificateOfAnalysis() {
                             className="md:w-64"
                         />
 
-                        <div className="flex flex-row gap-4 items-center">
+                        <div className="flex flex-col md:flex-row gap-4 items-center">
                             {/* THCA Filter Dropdown */}
                             <Select value={thcaFilter} onValueChange={(val) => {
                                 setThcaFilter(val);
@@ -213,7 +213,7 @@ export default function HempCertificateOfAnalysis() {
                         Previous
                     </Button>
 
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 text-sm md:text-base lg:text-lg font-medium">
                         Page {currentPage} of {totalPages}
                     </span>
 
@@ -228,16 +228,16 @@ export default function HempCertificateOfAnalysis() {
             </Card>
 
             {/* QR Code Generator for the PDF Files */}
-            <Card className="w-full h-full p-6 pb-12">
+            <Card className="w-full h-full p-2 lg:p-6 pb-12">
                 <h2 className="text-xl font-semibold mb-4">QR Code Generator</h2>
 
-                <div className="w-full h-full flex flex-row items-center justify-center gap-4">
+                <div className="w-full h-full flex flex-col lg:flex-row items-center justify-center gap-4">
                     {/* Left Side: File Selection */}
-                    <Card className="w-1/2 h-96 p-4 flex flex-col">
+                    <Card className="w-full lg:w-1/2 h-auto lg:h-96 p-4 flex flex-col">
                         <h3 className="text-xl font-bold mb-2 text-center py-3">Generate QR Code for Files</h3>
 
                         {/* Scrollable List */}
-                        <div className="flex-1 overflow-y-auto dark:bg-slate-800 bg-neutral-300 rounded-lg">
+                        <div className="h-72 lg:flex-1 overflow-y-auto dark:bg-slate-800 bg-neutral-300 rounded-lg">
                             <RadioGroup
                                 value={selectedFile || ""}
                                 onValueChange={setSelectedFile}
@@ -265,7 +265,7 @@ export default function HempCertificateOfAnalysis() {
                     </Card>
 
                     {/* Right Side: QR Code Display */}
-                    <Card className="w-1/2 h-96 p-4 flex flex-col items-center justify-center gap-4 dark:bg-slate-800 bg-neutral-300">
+                    <Card className="w-full lg:w-1/2 h-96 p-4 flex flex-col items-center justify-center gap-4 dark:bg-slate-800 bg-neutral-300">
                         {qrCodeData ? (
                             <>
                                 <QRCode

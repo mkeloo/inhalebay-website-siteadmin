@@ -333,9 +333,9 @@ export default function VapesDealsPage() {
     return (
         <div className="w-full max-w-[1200px] mx-auto">
             {/* Header */}
-            <Card className="w-full flex flex-row items-center justify-between gap-4 px-6 py-4 mb-4">
+            <Card className="w-full flex flex-col lg:flex-row items-center justify-between gap-4 px-6 py-4 mb-4">
                 <h1 className="text-2xl font-semibold">Vape Deals</h1>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap md:flex-row gap-4">
                     {/* Page Size Dropdown */}
                     <Select
                         value={String(pagination.pageSize)}
@@ -433,7 +433,7 @@ export default function VapesDealsPage() {
                 >
                     Previous
                 </Button>
-                <span className="text-lg font-medium">
+                <span className="text-sm md:text-base lg:text-lg font-medium">
                     Page {pagination.pageIndex + 1} of {table.getPageCount()}
                 </span>
                 <Button

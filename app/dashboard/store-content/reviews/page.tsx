@@ -188,7 +188,7 @@ export default function StoreReviewsPage() {
     return (
         <div className="w-full max-w-[1200px] mx-auto">
             {/* Header */}
-            <Card className="w-full flex flex-row items-center justify-between gap-4 px-6 py-4 mb-4">
+            <Card className="w-full flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-4 mb-4">
                 <h1 className="text-2xl font-semibold">Store Reviews</h1>
                 <Button
                     onClick={() => {
@@ -273,7 +273,9 @@ export default function StoreReviewsPage() {
                 <Button variant="outline" disabled={page === 1} onClick={() => setPage((prev) => Math.max(prev - 1, 1))}>
                     Previous
                 </Button>
-                <span className="text-lg font-medium">Page {page}</span>
+                <span className="text-sm md:text-base lg:text-lg font-medium">
+                    Page {page}
+                </span>
                 <Button variant="outline" onClick={() => setPage((prev) => prev + 1)}>
                     Next
                 </Button>
