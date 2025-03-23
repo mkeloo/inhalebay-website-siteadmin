@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
     ColumnFiltersState,
     SortingState,
@@ -122,56 +122,6 @@ export default function VapesDealsPage() {
         fetchAll();
     }, []);
 
-    // Table columns (pass mediaBaseUrl to columns)
-    const columns = useMemo(
-        () =>
-            createVapeDealColumns({
-                onViewDeal: handleEditDeal,
-                onDeleteDeal: handleDeleteDeal,
-                baseUrl: mediaBaseUrl,
-            }),
-        [mediaBaseUrl]
-    );
-
-    const table = useReactTable({
-        data,
-        columns,
-        enableColumnResizing: true,
-        columnResizeMode: "onChange" as ColumnResizeMode,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-            sorting,
-            columnFilters,
-            columnVisibility,
-            rowSelection,
-            pagination, // pass the pagination state here
-        },
-        onPaginationChange: setPagination, // update the pagination state when it changes
-        initialState: {
-            sorting: [{ id: "sort", desc: false }],
-        },
-    });
-
-    // ========== CREATE NEW DEAL ==========
-    function openCreateDialog() {
-        setNewCompany("");
-        setNewBuy1("");
-        setNewBuy2("");
-        setNewDiscount("");
-        setNewTagline("");
-        setNewShortTitle("");
-        setNewBgGradient("");
-        setNewFile(null);
-        setIsCreateDialogOpen(true);
-    }
-
     async function handleCreateDeal(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const formData = new FormData();
@@ -239,13 +189,14 @@ export default function VapesDealsPage() {
     }
 
     // ========== DELETE DEAL ==========
-    function handleDeleteDeal(dealId: number) {
+    const handleDeleteDeal = useCallback((dealId: number) => {
         const toDelete = data.find((d) => d.id === dealId);
         if (toDelete) {
             setSelectedDeal(toDelete);
             setIsDeleteDialogOpen(true);
         }
-    }
+    }, [data]);
+
 
     async function confirmDeleteDeal() {
         if (!selectedDeal) return;
@@ -259,6 +210,56 @@ export default function VapesDealsPage() {
             alert("Failed to delete deal: " + res.error);
         }
         setIsDeleteDialogOpen(false);
+    }
+
+    // Table columns (pass mediaBaseUrl to columns)
+    const columns = useMemo(
+        () =>
+            createVapeDealColumns({
+                onViewDeal: handleEditDeal,
+                onDeleteDeal: handleDeleteDeal,
+                baseUrl: mediaBaseUrl,
+            }),
+        [mediaBaseUrl, handleEditDeal, handleDeleteDeal]
+    );
+
+    const table = useReactTable({
+        data,
+        columns,
+        enableColumnResizing: true,
+        columnResizeMode: "onChange" as ColumnResizeMode,
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        onColumnVisibilityChange: setColumnVisibility,
+        onRowSelectionChange: setRowSelection,
+        state: {
+            sorting,
+            columnFilters,
+            columnVisibility,
+            rowSelection,
+            pagination, // pass the pagination state here
+        },
+        onPaginationChange: setPagination, // update the pagination state when it changes
+        initialState: {
+            sorting: [{ id: "sort", desc: false }],
+        },
+    });
+
+    // ========== CREATE NEW DEAL ==========
+    function openCreateDialog() {
+        setNewCompany("");
+        setNewBuy1("");
+        setNewBuy2("");
+        setNewDiscount("");
+        setNewTagline("");
+        setNewShortTitle("");
+        setNewBgGradient("");
+        setNewFile(null);
+        setIsCreateDialogOpen(true);
     }
 
     async function handleToggleEnabled(id: number, enabled: boolean) {
@@ -510,12 +511,12 @@ export default function VapesDealsPage() {
 
             {/* EDIT DEAL SHEET */}
             <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
-                <SheetContent className="w-[400px]">
+                <SheetContent className="w-[400px] overflow-scroll h-full pb-8">
                     <SheetHeader>
                         <SheetTitle>Edit Deal</SheetTitle>
                     </SheetHeader>
                     {selectedDeal && (
-                        <form onSubmit={handleUpdateDeal} className="space-y-4 mt-4">
+                        <form onSubmit={handleUpdateDeal} className="space-y-4 mt-4 px-4">
                             {selectedDeal.image_src && (
                                 <img
                                     src={mediaBaseUrl + selectedDeal.image_src}
@@ -566,9 +567,8 @@ export default function VapesDealsPage() {
                             <div>
                                 <Label>Deal Tagline</Label>
                                 <Input
-                                    value={editTagline}
-                                    onChange={(e) => setEditTagline(e.target.value)}
-                                    required
+                                    value={`BUY 1 for $${editBuy1 || "0"}, GET 2 for $${editBuy2 || "0"}`}
+                                    readOnly
                                 />
                             </div>
                             <div>
