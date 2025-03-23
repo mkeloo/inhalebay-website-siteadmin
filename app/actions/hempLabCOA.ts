@@ -37,3 +37,17 @@ export async function fetchAllHempLabCertificates(): Promise<{
         return { success: false, data: [], error: err.message };
     }
 }
+
+
+export async function fetchCertificatesURL(): Promise<string> {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from("inhale_bay_website_settings")
+        .select("option_value")
+        .eq("option_name", "certificates_url")
+        .single();
+
+    if (error) throw error;
+    if (!data) throw new Error("No certificates_url found in settings.");
+    return data.option_value as string;
+}

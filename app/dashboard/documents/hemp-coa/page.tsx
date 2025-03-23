@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { coaBaseURL, hempCOA } from "@/lib/index";
+import { fetchAllHempLabCertificates, fetchCertificatesURL, HempLabCertificates } from "../../../actions/hempLabCOA";
 import { QRCode } from "react-qrcode-logo";
 import inhalebaylogo from "@/assets/InhaleBayLogo.svg";
 
@@ -15,15 +16,38 @@ import inhalebaylogo from "@/assets/InhaleBayLogo.svg";
 const ITEMS_PER_PAGE = 13;
 
 export default function HempCertificateOfAnalysis() {
+    const [certificates, setCertificates] = useState<HempLabCertificates[]>([]);
+    const [certificatesURL, setCertificatesURL] = useState<string>("");
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedFile, setSelectedFile] = useState<string | null>(null);
     const [qrCodeData, setQrCodeData] = useState<string | null>(null);
 
-    // Calculate total pages
-    const totalPages = Math.ceil(hempCOA.length / ITEMS_PER_PAGE);
+    useEffect(() => {
+        async function fetchData() {
+            const certRes = await fetchAllHempLabCertificates();
+            if (certRes.success) {
+                setCertificates(certRes.data);
+            } else {
+                setError(certRes.error || "Error fetching certificates");
+            }
 
-    // Get current page items
-    const currentItems = hempCOA.slice(
+            try {
+                const url = await fetchCertificatesURL();
+                setCertificatesURL(url);
+            } catch (err: any) {
+                setError(err.message);
+            }
+        }
+
+        fetchData();
+    }, []);
+
+    // Calculate total pages
+    const totalPages = Math.ceil(certificates.length / ITEMS_PER_PAGE);
+
+    const paginatedCertificates = certificates.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
     );
@@ -46,10 +70,8 @@ export default function HempCertificateOfAnalysis() {
     const downloadQRCode = () => {
         const canvas = document.getElementById("qrCodeCanvas") as HTMLCanvasElement;
         if (canvas && selectedFile) {
-            const selectedFileData = hempCOA.find((file) => file.file_url === selectedFile);
-            // Use the file name if found; otherwise fallback to a default name
+            const selectedFileData = certificates.find((file) => file.file_url === selectedFile);
             const originalName = selectedFileData ? selectedFileData.file_name : "qrcode";
-            // Sanitize the file name by replacing characters that can cause issues
             const safeName = originalName.replace(/[:\/\\]/g, "_");
             const link = document.createElement("a");
             link.href = canvas.toDataURL("image/png");
@@ -61,30 +83,32 @@ export default function HempCertificateOfAnalysis() {
     return (
         <div className="w-full h-full flex flex-col items-center justify-start gap-6 pb-10">
             {/* Table */}
-            <Card className="w-full p-6">
+            <Card className="w-full p-6 max-w-[1200px] mx-auto">
                 <h2 className="text-xl font-semibold mb-4">Hemp Certificate of Analysis</h2>
 
-                <div className="overflow-x-auto">
-                    <Table>
+                <div className="w-full overflow-x-auto rounded-md border">
+                    <Table className="table-auto w-full mb-4 mx-4">
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-16">ID</TableHead>
-                                <TableHead>File Name</TableHead>
-                                <TableHead>File Type</TableHead>
-                                <TableHead className="w-32">File Size</TableHead>
-                                <TableHead className="w-32 text-center">Actions</TableHead>
+                                <TableHead className="w-16 border-r">ID</TableHead>
+                                <TableHead className="border-r">Name</TableHead>
+                                <TableHead className="border-r">File Name</TableHead>
+                                <TableHead className="border-r text-center">Actions</TableHead>
+                                <TableHead className="border-r">File Type</TableHead>
+                                <TableHead className="border-r">File Size</TableHead>
+                                <TableHead className="border-r">Created At</TableHead>
+                                <TableHead className="border-r">Updated At</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {currentItems.map((file) => (
-                                <TableRow key={file.id}>
-                                    <TableCell>{file.id}</TableCell>
-                                    <TableCell className="truncate max-w-xs">{file.file_name}</TableCell>
-                                    <TableCell>{file.file_type}</TableCell>
-                                    <TableCell>{file.file_size_kb.toFixed(2)} KB</TableCell>
-                                    <TableCell className="text-center">
+                            {paginatedCertificates.map((cert) => (
+                                <TableRow key={cert.id}>
+                                    <TableCell className="border-r truncate">{cert.serial_id}</TableCell>
+                                    <TableCell className="border-r truncate">{cert.name}</TableCell>
+                                    <TableCell className="border-r truncate">{cert.file_name}</TableCell>
+                                    <TableCell className="border-r text-center">
                                         <a
-                                            href={`${coaBaseURL}${file.file_url}`}
+                                            href={`${certificatesURL}${cert.file_url}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-blue-600 hover:underline"
@@ -92,11 +116,18 @@ export default function HempCertificateOfAnalysis() {
                                             View PDF
                                         </a>
                                     </TableCell>
+                                    <TableCell className="border-r">{cert.file_type}</TableCell>
+                                    <TableCell className="border-r">{cert.file_size_kb.toFixed(2)} KB</TableCell>
+                                    <TableCell className="border-r">{new Date(cert.created_at || "").toLocaleString()}</TableCell>
+                                    <TableCell className="border-r">{new Date(cert.updated_at || "").toLocaleString()}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 </div>
+
+                {error && <p className="text-center text-red-500 mt-4">{error}</p>}
+
 
                 {/* Pagination Controls */}
                 <div className="flex justify-between items-center mt-4">
@@ -138,7 +169,7 @@ export default function HempCertificateOfAnalysis() {
                                 onValueChange={setSelectedFile}
                                 className="space-y-2 p-4"
                             >
-                                {hempCOA.map((file) => (
+                                {certificates.map((file) => (
                                     <div key={file.id} className="flex items-center gap-2">
                                         <RadioGroupItem value={file.file_url} id={`file-${file.id}`} />
                                         <Label htmlFor={`file-${file.id}`} className="cursor-pointer">
@@ -152,7 +183,11 @@ export default function HempCertificateOfAnalysis() {
                         {/* Fixed Button */}
                         <Button
                             className="mt-4 w-full"
-                            onClick={generateQRCode}
+                            onClick={() => {
+                                if (selectedFile) {
+                                    setQrCodeData(`${certificatesURL}${selectedFile}`);
+                                }
+                            }}
                             disabled={!selectedFile}
                         >
                             Generate
