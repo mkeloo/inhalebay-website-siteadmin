@@ -275,8 +275,8 @@ export default function HempLabelMaker() {
             </div>
 
             {/* DOWNLOAD BUTTONS */}
-            <div className="w-full flex flex-col items-center justify-center gap-4 mt-6">
-                <div className="w-full flex flex-col lg:flex-row items-center justify-center gap-4">
+            <div className="w-full flex flex-col items-center justify-center gap-4 my-6">
+                <div className="w-full flex flex-col lg:flex-row lg:items-center lg:justify-center px-4 lg:px-0 gap-4">
                     <Button onClick={() => downloadPDF(frontLabelRef, `${selectedProduct ? selectedProduct.replace(/\s+/g, "-").toLowerCase() + "-front-label" : "front-label"}.pdf`)}>
                         Download Front as PDF
                     </Button>
@@ -284,7 +284,7 @@ export default function HempLabelMaker() {
                         Download Back as PDF
                     </Button>
                 </div>
-                <div className="w-full flex flex-col lg:flex-row items-center justify-center gap-4">
+                <div className="w-full flex flex-col lg:flex-row lg:items-center lg:justify-center px-4 lg:px-0  gap-4">
                     <Button onClick={() => downloadImage(frontLabelRef, `${selectedProduct ? selectedProduct.replace(/\s+/g, "-").toLowerCase() + "-front-label" : "front-label"}.png`)}>
                         Download Front as Image
                     </Button>
