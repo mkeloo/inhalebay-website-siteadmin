@@ -63,6 +63,9 @@ import { Switch } from "@/components/ui/switch";
 export default function HempFlowerDealsPage() {
     const [data, setData] = useState<FlowerBudDeal[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isCreating, setIsCreating] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [isSortMode, setIsSortMode] = useState(false);
 
     // Pagination state
@@ -118,6 +121,8 @@ export default function HempFlowerDealsPage() {
 
     async function handleCreateDeal(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        setIsCreating(true); // set loading state to true
+
         const formData = new FormData();
         formData.append("bud_name", newBudName);
         formData.append("one_gram_price", newOneGramPrice || "0");
@@ -135,6 +140,8 @@ export default function HempFlowerDealsPage() {
         } else {
             alert("Failed to create deal: " + res.error);
         }
+
+        setIsCreating(false); // set loading state to false
     }
 
     // ========== EDIT DEAL (SHEET) ==========
@@ -154,6 +161,8 @@ export default function HempFlowerDealsPage() {
     async function handleUpdateDeal(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!selectedDeal) return;
+        setIsUpdating(true);
+
         const formData = new FormData();
         formData.append("bud_name", editBudName);
         formData.append("one_gram_price", editOneGramPrice || "0");
@@ -171,6 +180,8 @@ export default function HempFlowerDealsPage() {
         } else {
             alert("Failed to update deal: " + res.error);
         }
+
+        setIsUpdating(false);
     }
 
     // ========== DELETE DEAL ==========
@@ -184,6 +195,8 @@ export default function HempFlowerDealsPage() {
 
     async function confirmDeleteDeal() {
         if (!selectedDeal) return;
+        setIsDeleting(true);
+
         const res = await deleteFlowerBudDeal(selectedDeal.id);
         if (res.success) {
             const dealsRes = await fetchFlowerBudDeals();
@@ -194,6 +207,7 @@ export default function HempFlowerDealsPage() {
             alert("Failed to delete deal: " + res.error);
         }
         setIsDeleteDialogOpen(false);
+        setIsDeleting(false);
     }
 
 
@@ -461,7 +475,7 @@ export default function HempFlowerDealsPage() {
                             <Input type="file" onChange={(e) => setNewFile(e.target.files?.[0] || null)} />
                         </div>
                         <DialogFooter>
-                            <Button type="submit">Create</Button>
+                            <Button type="submit" loading={isCreating}>Create</Button>
                             <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                                 Cancel
                             </Button>
@@ -529,7 +543,7 @@ export default function HempFlowerDealsPage() {
                                 <Input type="file" onChange={(e) => setEditFile(e.target.files?.[0] || null)} />
                             </div>
                             <div className="flex justify-end gap-2 mt-4">
-                                <Button type="submit">Save Changes</Button>
+                                <Button type="submit" loading={isUpdating}>Save Changes</Button>
                                 <Button variant="outline" onClick={() => setIsEditSheetOpen(false)}>
                                     Cancel
                                 </Button>
@@ -550,7 +564,7 @@ export default function HempFlowerDealsPage() {
                         <strong>{selectedDeal?.bud_name ?? "this deal"}</strong>?
                     </p>
                     <DialogFooter>
-                        <Button variant="destructive" onClick={confirmDeleteDeal}>
+                        <Button variant="destructive" onClick={confirmDeleteDeal} loading={isDeleting}>
                             Delete
                         </Button>
                         <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
