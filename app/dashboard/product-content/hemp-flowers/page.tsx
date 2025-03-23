@@ -98,6 +98,8 @@ export default function HempFlowerDealsPage() {
     const [newFourGramPrice, setNewFourGramPrice] = useState("");
     const [newBgGradient, setNewBgGradient] = useState(generateRandomGradient());
     const [newFile, setNewFile] = useState<File | null>(null);
+    const [newIsEnabled, setNewIsEnabled] = useState(false);
+
 
     // States for updating an existing deal (used in the sheet)
     const [editBudName, setEditBudName] = useState("");
@@ -105,6 +107,7 @@ export default function HempFlowerDealsPage() {
     const [editFourGramPrice, setEditFourGramPrice] = useState("");
     const [editBgGradient, setEditBgGradient] = useState("");
     const [editFile, setEditFile] = useState<File | null>(null);
+    const [editIsEnabled, setEditIsEnabled] = useState(true);
 
 
     // Fetch all deals and media base URL on mount
@@ -130,6 +133,7 @@ export default function HempFlowerDealsPage() {
         formData.append("one_gram_price", newOneGramPrice || "0");
         formData.append("four_gram_price", newFourGramPrice || "0");
         formData.append("bg_gradient", newBgGradient);
+        formData.append("is_enabled", String(newIsEnabled));
         if (newFile) formData.append("file", newFile);
 
         const res = await createFlowerBudDealWithFile(formData);
@@ -168,6 +172,7 @@ export default function HempFlowerDealsPage() {
             setEditFourGramPrice(String(res.data.four_gram_price));
             setEditBgGradient(res.data.bg_gradient);
             setEditFile(null);
+            setEditIsEnabled(res.data.is_enabled ?? false); // <-- add this line
             setIsEditSheetOpen(true);
         }
     }
@@ -182,6 +187,7 @@ export default function HempFlowerDealsPage() {
         formData.append("one_gram_price", editOneGramPrice || "0");
         formData.append("four_gram_price", editFourGramPrice || "0");
         formData.append("bg_gradient", editBgGradient);
+        formData.append("is_enabled", String(editIsEnabled));
         if (editFile) formData.append("file", editFile);
 
         const res = await updateFlowerBudDealWithFile(selectedDeal.id, formData);
@@ -478,6 +484,13 @@ export default function HempFlowerDealsPage() {
                             <Label>Image File</Label>
                             <Input type="file" onChange={(e) => setNewFile(e.target.files?.[0] || null)} />
                         </div>
+                        <div className="w-full flex items-center justify-end gap-2">
+                            <Switch
+                                checked={newIsEnabled}
+                                onCheckedChange={setNewIsEnabled}
+                            />
+                            <Label>Enabled</Label>
+                        </div>
                         <DialogFooter>
                             <Button type="submit" loading={isCreating}>Create</Button>
                             <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
@@ -545,6 +558,13 @@ export default function HempFlowerDealsPage() {
                             <div>
                                 <Label>Replace Image (optional)</Label>
                                 <Input type="file" onChange={(e) => setEditFile(e.target.files?.[0] || null)} />
+                            </div>
+                            <div className="w-full flex items-center justify-start gap-2">
+                                <Switch
+                                    checked={editIsEnabled}
+                                    onCheckedChange={setEditIsEnabled}
+                                />
+                                <Label>Enabled</Label>
                             </div>
                             <div className="flex justify-end gap-2 mt-4">
                                 <Button type="submit" loading={isUpdating}>Save Changes</Button>

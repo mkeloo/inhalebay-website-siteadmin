@@ -101,6 +101,8 @@ export default function VapesDealsPage() {
     const [newShortTitle, setNewShortTitle] = useState("");
     const [newBgGradient, setNewBgGradient] = useState(generateRandomGradient());
     const [newFile, setNewFile] = useState<File | null>(null);
+    const [newIsEnabled, setNewIsEnabled] = useState(false);
+
 
     // States for updating an existing deal (used in the sheet)
     const [editCompany, setEditCompany] = useState("");
@@ -111,6 +113,8 @@ export default function VapesDealsPage() {
     const [editShortTitle, setEditShortTitle] = useState("");
     const [editBgGradient, setEditBgGradient] = useState("");
     const [editFile, setEditFile] = useState<File | null>(null);
+    const [editIsEnabled, setEditIsEnabled] = useState(true);
+
 
 
     // Fetch all deals and media base URL on mount
@@ -139,6 +143,7 @@ export default function VapesDealsPage() {
         formData.append("deal_tagline", newTagline);
         formData.append("short_title", newShortTitle);
         formData.append("bg_gradient", newBgGradient);
+        formData.append("is_enabled", String(newIsEnabled));
         if (newFile) formData.append("file", newFile);
 
         const res = await createVapeDealWithFile(formData);
@@ -181,6 +186,7 @@ export default function VapesDealsPage() {
             setEditTagline(res.data.deal_tagline);
             setEditShortTitle(res.data.short_title);
             setEditBgGradient(res.data.bg_gradient);
+            setEditIsEnabled(res.data.is_enabled ?? false); // <-- add this line
             setEditFile(null);
             setIsEditSheetOpen(true);
         }
@@ -199,6 +205,7 @@ export default function VapesDealsPage() {
         formData.append("deal_tagline", editTagline);
         formData.append("short_title", editShortTitle);
         formData.append("bg_gradient", editBgGradient);
+        formData.append("is_enabled", String(editIsEnabled));
         if (editFile) formData.append("file", editFile);
 
         const res = await updateVapeDealWithFile(selectedDeal.id, formData);
@@ -516,6 +523,13 @@ export default function VapesDealsPage() {
                             <Label>Image File</Label>
                             <Input type="file" onChange={(e) => setNewFile(e.target.files?.[0] || null)} />
                         </div>
+                        <div className="w-full flex items-center justify-end gap-2">
+                            <Switch
+                                checked={newIsEnabled}
+                                onCheckedChange={setNewIsEnabled}
+                            />
+                            <Label>Enabled</Label>
+                        </div>
                         <DialogFooter>
                             <Button type="submit" loading={isCreating}>Create</Button>
                             <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
@@ -608,6 +622,13 @@ export default function VapesDealsPage() {
                             <div>
                                 <Label>Replace Image (optional)</Label>
                                 <Input type="file" onChange={(e) => setEditFile(e.target.files?.[0] || null)} />
+                            </div>
+                            <div className="w-full flex items-center justify-start gap-2">
+                                <Switch
+                                    checked={editIsEnabled}
+                                    onCheckedChange={setEditIsEnabled}
+                                />
+                                <Label>Enabled</Label>
                             </div>
                             <div className="flex justify-end gap-2 mt-4">
                                 <Button type="submit" loading={isUpdating}>Save Changes</Button>
