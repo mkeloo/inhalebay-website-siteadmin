@@ -63,87 +63,92 @@ export default function HempLabelMaker() {
     }
 
     return (
-        <div className="space-y-8 max-w-screen-xl mx-auto p-4 flex flex-col lg:flex-row items-start justify-center lg:justify-between gap-4">
+        <div className="w-full space-y-8 max-w-screen-xl p-4 flex flex-col lg:flex-row items-start justify-center lg:justify-between gap-6">
             {/* Controls */}
-            <Card className="p-6 space-y-6">
+            <Card className="w-full lg:w-[60%] p-4 space-y-6">
                 <h2 className="text-3xl font-semibold text-center">Hemp Label Maker</h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                    <div>
-                        <Label>Label Width</Label>
+                <div className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <Label>Label Width</Label>
+                            <input
+                                type="text"
+                                value={`${LABEL_WIDTH}"`}
+                                disabled
+                                className="mt-1 w-full rounded border px-2 py-1"
+                            />
+                        </div>
+                        <div>
+                            <Label>Label Height</Label>
+                            <input
+                                type="text"
+                                value={`${LABEL_HEIGHT}"`}
+                                disabled
+                                className="mt-1 w-full rounded border px-2 py-1"
+                            />
+                        </div>
+                        <div>
+                            <Label>Weight</Label>
+                            <Select value={productWeight} onValueChange={setProductWeight}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select weight" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="1g">1g</SelectItem>
+                                    <SelectItem value="4g">4g</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    {/* Google Doc URL input */}
+                    <div className="mt-4">
+                        <Label>Google Doc Template URL</Label>
                         <input
-                            type="text"
-                            value={`${LABEL_WIDTH}"`}
-                            disabled
+                            type="url"
+                            placeholder="Paste your Google Doc link here"
+                            value={docUrl}
+                            onChange={(e) => setDocUrl(e.currentTarget.value)}
                             className="mt-1 w-full rounded border px-2 py-1"
                         />
                     </div>
-                    <div>
-                        <Label>Label Height</Label>
-                        <input
-                            type="text"
-                            value={`${LABEL_HEIGHT}"`}
-                            disabled
-                            className="mt-1 w-full rounded border px-2 py-1"
-                        />
-                    </div>
-                    <div>
-                        <Label>Weight</Label>
-                        <Select value={productWeight} onValueChange={setProductWeight}>
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select weight" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="1g">1g</SelectItem>
-                                <SelectItem value="4g">4g</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
+
+
+                    {/* PRODUCT SELECTION FROM VERTICAL LIST */}
+                    <Card className="w-full h-[364px] p-2 md:p-4 flex flex-col">
+                        <h3 className="text-xl font-bold text-center ">Select a Product</h3>
+                        <div className="flex-1 overflow-y-auto dark:bg-slate-800 bg-neutral-300 rounded-lg">
+                            <RadioGroup
+                                value={selectedProductUrl}
+                                onValueChange={(fileUrl) => {
+                                    const selectedCert = labCertificates.find(cert => cert.file_url === fileUrl);
+                                    if (selectedCert) {
+                                        handleProductSelection(fileUrl, selectedCert.name);
+                                    }
+                                }}
+                                className="space-y-2 p-4"
+                            >
+                                {labCertificates.map((cert) => (
+                                    <div key={cert.id} className="flex items-center gap-2">
+                                        <RadioGroupItem value={cert.file_url} id={`product-${cert.id}`} />
+                                        <Label htmlFor={`product-${cert.id}`} className="cursor-pointer">
+                                            {cert.name}
+                                        </Label>
+                                    </div>
+                                ))}
+                            </RadioGroup>
+                        </div>
+                    </Card>
                 </div>
 
-                {/* Google Doc URL input */}
-                <div className="mt-4">
-                    <Label>Google Doc Template URL</Label>
-                    <input
-                        type="url"
-                        placeholder="Paste your Google Doc link here"
-                        value={docUrl}
-                        onChange={(e) => setDocUrl(e.currentTarget.value)}
-                        className="mt-1 w-full rounded border px-2 py-1"
-                    />
-                </div>
 
-                {/* PRODUCT SELECTION FROM VERTICAL LIST */}
-                <Card className="w-full h-96 p-2 md:p-4 flex flex-col">
-                    <h3 className="text-xl font-bold text-center ">Select a Product</h3>
-                    <div className="flex-1 overflow-y-auto dark:bg-slate-800 bg-neutral-300 rounded-lg">
-                        <RadioGroup
-                            value={selectedProductUrl}
-                            onValueChange={(fileUrl) => {
-                                const selectedCert = labCertificates.find(cert => cert.file_url === fileUrl);
-                                if (selectedCert) {
-                                    handleProductSelection(fileUrl, selectedCert.name);
-                                }
-                            }}
-                            className="space-y-2 p-4"
-                        >
-                            {labCertificates.map((cert) => (
-                                <div key={cert.id} className="flex items-center gap-2">
-                                    <RadioGroupItem value={cert.file_url} id={`product-${cert.id}`} />
-                                    <Label htmlFor={`product-${cert.id}`} className="cursor-pointer">
-                                        {cert.name}
-                                    </Label>
-                                </div>
-                            ))}
-                        </RadioGroup>
-                    </div>
-                </Card>
             </Card>
 
             {/* Single-Label Preview */}
-            <div className="space-y-4 text-center">
+            <Card className="w-full lg:w-[40%] space-y-4 text-center p-4">
                 <h2 className="text-2xl font-semibold">Label Preview</h2>
-                <div ref={labelRef} className="inline-block">
+                <div ref={labelRef} className="w-full flex flex-col items-center justify-center p-6 border rounded-lg bg-gray-400 shadow-md  ">
                     <IndividualLabelPreview
                         id="preview-label"
                         productName={selectedProduct || "Product Name THCA Flower"}
@@ -168,7 +173,7 @@ export default function HempLabelMaker() {
                         </Button>
                     </a>
                 </div>
-            </div>
+            </Card>
         </div>
     );
 }
