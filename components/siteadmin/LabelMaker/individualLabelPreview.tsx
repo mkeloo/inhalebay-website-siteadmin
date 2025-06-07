@@ -16,8 +16,8 @@ export interface IndividualLabelPreviewProps {
 }
 
 const INCH_TO_PX = 96;
-const LABEL_WIDTH_PX = 4 * INCH_TO_PX;
-const LABEL_HEIGHT_PX = 1 * INCH_TO_PX;
+const LABEL_WIDTH_PX = (3.85) * INCH_TO_PX;
+const LABEL_HEIGHT_PX = (0.85) * INCH_TO_PX;
 
 export const IndividualLabelPreview = React.forwardRef<
     HTMLDivElement,
@@ -52,11 +52,11 @@ export const IndividualLabelPreview = React.forwardRef<
             >
                 {/* 1) Logo */}
                 <div className="flex-shrink-0">
-                    <img src={logoSrc} alt="Logo" className="h-auto w-20" />
+                    <img src={logoSrc} alt="Logo" className="h-auto w-16 rounded-lg" />
                 </div>
 
                 {/* 2) Center content */}
-                <div className="flex-1 px-2 text-center">
+                <div className="w-full px-2 text-center">
                     <h4 className="font-bold text-sm leading-tight text-black">
                         {firstLine}
                         <span className="text-xs font-medium">
@@ -65,7 +65,7 @@ export const IndividualLabelPreview = React.forwardRef<
                         </span>
                     </h4>
 
-                    <p className="text-[8px] mt-1 leading-snug text-black">
+                    <p className="text-[8px] mt-1 leading-tight text-black">
                         {warningText}
                     </p>
                 </div>
@@ -74,7 +74,7 @@ export const IndividualLabelPreview = React.forwardRef<
                 <div className="flex-shrink-0">
                     <QRCode
                         value={qrValue}
-                        size={64}
+                        size={60}
                         ecLevel="H"
                         qrStyle="dots"
                         fgColor="#000000"

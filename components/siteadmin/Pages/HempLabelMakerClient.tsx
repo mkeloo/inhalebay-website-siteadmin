@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 const BACKUP_GOOGLE_DOC_URL = "https://docs.google.com/document/d/19UBrebsqHlbk18JM5jtZZcJCZLVf6m-ZOR-z42GWTrU/edit?usp=sharing";
 
 const WARNINGS =
-    "Warning: This product contains hemp-derived compounds. Keep out of reach of children.";
+    "Warning: Keep out of reach of children.";
 
 
 export default function HempLabelMaker() {
@@ -167,15 +167,17 @@ export default function HempLabelMaker() {
             {/* Single-Label Preview */}
             <Card className="w-full lg:w-[40%] space-y-4 text-center p-4">
                 <h2 className="text-3xl font-semibold text-center">Label Preview</h2>
-                <div ref={labelRef} className="w-full flex flex-col items-center justify-center p-6 border rounded-lg bg-gray-400 shadow-md  ">
-                    <IndividualLabelPreview
-                        id="preview-label"
-                        productName={selectedProduct || "Product Name THCA Flower"}
-                        weight={productWeight}
-                        qrValue={selectedProductUrl}
-                        logoSrc={inhalebaylogo.src}
-                        warningText={WARNINGS}
-                    />
+                <div className="w-full flex flex-col items-center justify-center p-6 border rounded-lg bg-gray-400 shadow-md  ">
+                    <div ref={labelRef} className="inline-block">
+                        <IndividualLabelPreview
+                            id="preview-label"
+                            productName={selectedProduct || "Product Name THCA Flower"}
+                            weight={productWeight}
+                            qrValue={selectedProductUrl}
+                            logoSrc={inhalebaylogo.src}
+                            warningText={WARNINGS}
+                        />
+                    </div>
                 </div>
                 <div className="flex flex-col sm:flex-row justify-center gap-4">
                     <Button onClick={downloadLabel} disabled={!selectedProductUrl}>
