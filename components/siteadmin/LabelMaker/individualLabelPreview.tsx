@@ -36,6 +36,11 @@ export const IndividualLabelPreview = React.forwardRef<
         },
         ref
     ) => {
+        // Split productName so any "THCA…" part wraps to the next line
+        const match = productName.match(/(.*?)(THCA.*)/i);
+        const firstLine = match ? match[1].trim() : productName;
+        const secondLine = match ? match[2].trim() : "";
+
         return (
             <Card
                 ref={ref}
@@ -52,14 +57,21 @@ export const IndividualLabelPreview = React.forwardRef<
 
                 {/* 2) Center content */}
                 <div className="flex-1 px-2 text-center">
-                    <h4 className="font-bold text-sm leading-tight text-black">{productName}</h4>
-                    <p className="text-xs leading-snug text-black">{weight}</p>
-                    <p className="text-[8px] mt-1 leading-snug text-black">{warningText}</p>
+                    <h4 className="font-bold text-sm leading-tight text-black">
+                        {firstLine}
+                        <span className="text-xs font-medium">
+                            {secondLine && <><br />{secondLine}</>}
+                            <span className="text-xs leading-snug text-black mx-2">{weight}</span>
+                        </span>
+                    </h4>
+
+                    <p className="text-[8px] mt-1 leading-snug text-black">
+                        {warningText}
+                    </p>
                 </div>
 
                 {/* 3) QR */}
                 <div className="flex-shrink-0">
-                    {/* <QRCode value={qrValue} size={64} quietZone={4} fgColor="#000" bgColor="#FFF" /> */}
                     <QRCode
                         value={qrValue}
                         size={64}

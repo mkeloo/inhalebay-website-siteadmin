@@ -146,7 +146,7 @@ export default function HempLabelMaker() {
                 <div ref={labelRef} className="inline-block">
                     <IndividualLabelPreview
                         id="preview-label"
-                        productName={selectedProduct || "Product Name"}
+                        productName={selectedProduct || "Product Name THCA Flower"}
                         weight={productWeight}
                         qrValue={selectedProductUrl}
                         logoSrc={inhalebaylogo.src}
@@ -158,7 +158,7 @@ export default function HempLabelMaker() {
                         Download Label Image
                     </Button>
                     <a
-                        href={docUrl || "https://docs.google.com/document/d/YOUR_TEMPLATE_ID/edit"}
+                        href={docUrl || BACKUP_GOOGLE_DOC_URL}
                         target="_blank"
                         rel="noreferrer"
                         className="inline-block"
