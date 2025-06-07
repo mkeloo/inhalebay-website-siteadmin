@@ -16,7 +16,9 @@ import { Button } from "@/components/ui/button";
 import { fetchAllHempLabCertificates, HempLabCertificates } from "../../../actions/hempLabCOA";
 import { toPng } from "html-to-image";
 import { IndividualLabelPreview } from "@/components/siteadmin/LabelMaker/individualLabelPreview";
-import inhalebaylogo from "@/assets/InhaleBayLogo.svg";
+// import inhalebaylogo from "@/assets/InhaleBayLogo.svg";
+import inhalebaylogo from "@/assets/InhaleBayLogoInvert.webp";
+
 
 const BACKUP_GOOGLE_DOC_URL = "https://docs.google.com/document/d/19UBrebsqHlbk18JM5jtZZcJCZLVf6m-ZOR-z42GWTrU/edit?usp=sharing";
 

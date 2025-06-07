@@ -47,7 +47,7 @@ export const IndividualLabelPreview = React.forwardRef<
             >
                 {/* 1) Logo */}
                 <div className="flex-shrink-0">
-                    <img src={logoSrc} alt="Logo" className="h-8 w-auto" />
+                    <img src={logoSrc} alt="Logo" className="h-auto w-20" />
                 </div>
 
                 {/* 2) Center content */}
@@ -59,7 +59,22 @@ export const IndividualLabelPreview = React.forwardRef<
 
                 {/* 3) QR */}
                 <div className="flex-shrink-0">
-                    <QRCode value={qrValue} size={64} quietZone={4} fgColor="#000" bgColor="#FFF" />
+                    {/* <QRCode value={qrValue} size={64} quietZone={4} fgColor="#000" bgColor="#FFF" /> */}
+                    <QRCode
+                        value={qrValue}
+                        size={64}
+                        ecLevel="H"
+                        qrStyle="dots"
+                        fgColor="#000000"
+                        bgColor="#FFFFFF"
+                        style={{ borderRadius: 10, border: "2px solid #000000" }}
+                        quietZone={5}
+                        eyeRadius={[
+                            { outer: 12, inner: 4 },
+                            { outer: 12, inner: 4 },
+                            { outer: 12, inner: 4 },
+                        ]}
+                    />
                 </div>
             </Card>
         );
