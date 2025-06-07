@@ -1,55 +1,48 @@
+// app/siteadmin/LabelMaker/HempLabelMaker.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
     Select,
-    SelectContent,
-    SelectItem,
     SelectTrigger,
     SelectValue,
+    SelectContent,
+    SelectItem,
 } from "@/components/ui/select";
-import {
-    fetchAllHempLabCertificates,
-    HempLabCertificates,
-} from "../../../actions/hempLabCOA";
-import { SheetPreview, LabelPlacement } from "@/components/siteadmin/LabelMaker/SheetPreview";
+import { Button } from "@/components/ui/button";
+import { fetchAllHempLabCertificates, HempLabCertificates } from "../../../actions/hempLabCOA";
+import { toPng } from "html-to-image";
+import { IndividualLabelPreview } from "@/components/siteadmin/LabelMaker/individualLabelPreview";
 import inhalebaylogo from "@/assets/InhaleBayLogo.svg";
+
+const BACKUP_GOOGLE_DOC_URL = "https://docs.google.com/document/d/19UBrebsqHlbk18JM5jtZZcJCZLVf6m-ZOR-z42GWTrU/edit?usp=sharing";
 
 const WARNINGS =
     "Warning: This product contains hemp-derived compounds. Keep out of reach of children.";
 
+
 export default function HempLabelMaker() {
     const [labCertificates, setLabCertificates] = useState<HempLabCertificates[]>([]);
     const [productWeight, setProductWeight] = useState("1g");
-    const [numLabels, setNumLabels] = useState(1);
     const [selectedProductUrl, setSelectedProductUrl] = useState("");
     const [selectedProduct, setSelectedProduct] = useState("");
+    const [docUrl, setDocUrl] = useState(BACKUP_GOOGLE_DOC_URL);  // <-- new state
 
-    // fixed dimensions
+    // fixed label size
     const LABEL_WIDTH = 4;
     const LABEL_HEIGHT = 1;
 
-    // placements: one per label, each with a slotIndex 0–19
-    const [placements, setPlacements] = useState<LabelPlacement[]>([]);
+    const labelRef = useRef<HTMLDivElement>(null);
 
-    // whenever numLabels changes, re-init placements 0..numLabels-1
+    // load lab certs
     useEffect(() => {
-        const initial: LabelPlacement[] = Array.from({ length: numLabels }).map((_, i) => ({
-            id: `label-${i}`,
-            slotIndex: i,
-        }));
-        setPlacements(initial);
-    }, [numLabels]);
-
-    useEffect(() => {
-        async function load() {
+        (async () => {
             const { success, data } = await fetchAllHempLabCertificates();
             if (success) setLabCertificates(data);
-        }
-        load();
+        })();
     }, []);
 
     function handleProductSelection(fileUrl: string, name: string) {
@@ -57,10 +50,20 @@ export default function HempLabelMaker() {
         setSelectedProduct(name);
     }
 
+    // download the single label as PNG
+    async function downloadLabel() {
+        if (!labelRef.current) return;
+        const dataUrl = await toPng(labelRef.current);
+        const link = document.createElement("a");
+        link.download = `${selectedProduct?.replace(/\s+/g, "-").toLowerCase() || "label"}.png`;
+        link.href = dataUrl;
+        link.click();
+    }
+
     return (
-        <div className="space-y-6">
+        <div className="space-y-8 max-w-screen-xl mx-auto p-4 flex flex-col lg:flex-row items-start justify-center lg:justify-between gap-4">
             {/* Controls */}
-            <Card className="p-6 space-y-6 max-w-2xl mx-auto">
+            <Card className="p-6 space-y-6">
                 <h2 className="text-3xl font-semibold text-center">Hemp Label Maker</h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
@@ -94,38 +97,38 @@ export default function HempLabelMaker() {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div>
-                        <Label># of Labels</Label>
-                        <input
-                            type="number"
-                            min={1}
-                            max={20}
-                            value={numLabels}
-                            onChange={(e) =>
-                                setNumLabels(
-                                    Math.max(1, Math.min(20, Number(e.currentTarget.value)))
-                                )
-                            }
-                            className="mt-1 w-full rounded border px-2 py-1"
-                        />
-                    </div>
                 </div>
 
-                <Card className="w-full h-80 p-4">
-                    <h3 className="text-xl font-bold text-center">Select a Product</h3>
-                    <div className="overflow-y-auto h-full rounded-lg p-4">
+                {/* Google Doc URL input */}
+                <div className="mt-4">
+                    <Label>Google Doc Template URL</Label>
+                    <input
+                        type="url"
+                        placeholder="Paste your Google Doc link here"
+                        value={docUrl}
+                        onChange={(e) => setDocUrl(e.currentTarget.value)}
+                        className="mt-1 w-full rounded border px-2 py-1"
+                    />
+                </div>
+
+                {/* PRODUCT SELECTION FROM VERTICAL LIST */}
+                <Card className="w-full h-96 p-2 md:p-4 flex flex-col">
+                    <h3 className="text-xl font-bold text-center ">Select a Product</h3>
+                    <div className="flex-1 overflow-y-auto dark:bg-slate-800 bg-neutral-300 rounded-lg">
                         <RadioGroup
                             value={selectedProductUrl}
-                            onValueChange={(url) => {
-                                const cert = labCertificates.find((c) => c.file_url === url);
-                                if (cert) handleProductSelection(url, cert.name);
+                            onValueChange={(fileUrl) => {
+                                const selectedCert = labCertificates.find(cert => cert.file_url === fileUrl);
+                                if (selectedCert) {
+                                    handleProductSelection(fileUrl, selectedCert.name);
+                                }
                             }}
-                            className="space-y-3"
+                            className="space-y-2 p-4"
                         >
                             {labCertificates.map((cert) => (
-                                <div key={cert.id} className="flex items-center">
-                                    <RadioGroupItem value={cert.file_url} id={cert.id} />
-                                    <Label htmlFor={cert.id} className="ml-2 cursor-pointer">
+                                <div key={cert.id} className="flex items-center gap-2">
+                                    <RadioGroupItem value={cert.file_url} id={`product-${cert.id}`} />
+                                    <Label htmlFor={`product-${cert.id}`} className="cursor-pointer">
                                         {cert.name}
                                     </Label>
                                 </div>
@@ -135,19 +138,34 @@ export default function HempLabelMaker() {
                 </Card>
             </Card>
 
-            {/* Sheet Preview */}
-            <div className="max-w-4xl mx-auto p-4">
-                <h2 className="text-2xl font-semibold mb-4 text-center">Sheet Preview</h2>
-                <SheetPreview
-                    placements={placements}
-                    numLabels={numLabels}
-                    productName={selectedProduct}
-                    weight={productWeight}
-                    qrValue={selectedProductUrl}
-                    logoSrc={inhalebaylogo.src}
-                    warningText={WARNINGS}
-                    onReorder={setPlacements}
-                />
+            {/* Single-Label Preview */}
+            <div className="space-y-4 text-center">
+                <h2 className="text-2xl font-semibold">Label Preview</h2>
+                <div ref={labelRef} className="inline-block">
+                    <IndividualLabelPreview
+                        id="preview-label"
+                        productName={selectedProduct || "Product Name"}
+                        weight={productWeight}
+                        qrValue={selectedProductUrl}
+                        logoSrc={inhalebaylogo.src}
+                        warningText={WARNINGS}
+                    />
+                </div>
+                <div className="flex flex-col sm:flex-row justify-center gap-4">
+                    <Button onClick={downloadLabel} disabled={!selectedProductUrl}>
+                        Download Label Image
+                    </Button>
+                    <a
+                        href={docUrl || "https://docs.google.com/document/d/YOUR_TEMPLATE_ID/edit"}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-block"
+                    >
+                        <Button variant="secondary" disabled={!docUrl}>
+                            Open Google Doc Template
+                        </Button>
+                    </a>
+                </div>
             </div>
         </div>
     );
