@@ -18,6 +18,7 @@ import { IndividualLabelPreview } from "@/components/siteadmin/LabelMaker/indivi
 // import inhalebaylogo from "@/assets/InhaleBayLogo.svg";
 import inhalebaylogo from "@/assets/InhaleBayLogoInvert.webp";
 import { fetchAllHempLabCertificates, HempLabCertificates } from "@/app/actions/hempLabCOA";
+import { Input } from "@/components/ui/input";
 
 
 const BACKUP_GOOGLE_DOC_URL = "https://docs.google.com/document/d/19UBrebsqHlbk18JM5jtZZcJCZLVf6m-ZOR-z42GWTrU/edit?usp=sharing";
@@ -32,6 +33,7 @@ export default function HempLabelMaker() {
     const [selectedProductUrl, setSelectedProductUrl] = useState("");
     const [selectedProduct, setSelectedProduct] = useState("");
     const [docUrl, setDocUrl] = useState(BACKUP_GOOGLE_DOC_URL);  // <-- new state
+    const [searchTerm, setSearchTerm] = useState("");
 
     // fixed label size
     const LABEL_WIDTH = 4;
@@ -117,26 +119,43 @@ export default function HempLabelMaker() {
 
                     {/* PRODUCT SELECTION FROM VERTICAL LIST */}
                     <Card className="w-full h-[364px] p-2 md:p-4 flex flex-col">
-                        <h3 className="text-xl font-bold text-center ">Select a Product</h3>
-                        <div className="flex-1 overflow-y-auto dark:bg-slate-800 bg-neutral-300 rounded-lg">
+                        {/* title + search */}
+                        <div className="w-full flex flex-col lg:flex-row items-center justify-between mb-2 px-2 gap-4">
+                            <h3 className="text-xl font-bold">Select a Product</h3>
+
+                            {/* search input */}
+                            <Input
+                                type="text"
+                                placeholder="Search…"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.currentTarget.value)}
+                                className="w-full lg:w-1/3 rounded border px-2 py-1 text-sm"
+                            />
+
+                        </div>
+
+                        {/* filtered list */}
+                        <div className="flex-1 overflow-y-auto dark:bg-slate-800 bg-neutral-300 rounded-lg p-4">
                             <RadioGroup
                                 value={selectedProductUrl}
                                 onValueChange={(fileUrl) => {
-                                    const selectedCert = labCertificates.find(cert => cert.file_url === fileUrl);
-                                    if (selectedCert) {
-                                        handleProductSelection(fileUrl, selectedCert.name);
-                                    }
+                                    const cert = labCertificates.find((c) => c.file_url === fileUrl);
+                                    if (cert) handleProductSelection(fileUrl, cert.name);
                                 }}
-                                className="space-y-2 p-4"
+                                className="space-y-2"
                             >
-                                {labCertificates.map((cert) => (
-                                    <div key={cert.id} className="flex items-center gap-2">
-                                        <RadioGroupItem value={cert.file_url} id={`product-${cert.id}`} />
-                                        <Label htmlFor={`product-${cert.id}`} className="cursor-pointer">
-                                            {cert.name}
-                                        </Label>
-                                    </div>
-                                ))}
+                                {labCertificates
+                                    .filter((cert) =>
+                                        cert.name.toLowerCase().includes(searchTerm.toLowerCase())
+                                    )
+                                    .map((cert) => (
+                                        <div key={cert.id} className="flex items-center gap-2">
+                                            <RadioGroupItem value={cert.file_url} id={`product-${cert.id}`} />
+                                            <Label htmlFor={`product-${cert.id}`} className="cursor-pointer">
+                                                {cert.name}
+                                            </Label>
+                                        </div>
+                                    ))}
                             </RadioGroup>
                         </div>
                     </Card>
@@ -147,7 +166,7 @@ export default function HempLabelMaker() {
 
             {/* Single-Label Preview */}
             <Card className="w-full lg:w-[40%] space-y-4 text-center p-4">
-                <h2 className="text-2xl font-semibold">Label Preview</h2>
+                <h2 className="text-3xl font-semibold text-center">Label Preview</h2>
                 <div ref={labelRef} className="w-full flex flex-col items-center justify-center p-6 border rounded-lg bg-gray-400 shadow-md  ">
                     <IndividualLabelPreview
                         id="preview-label"
