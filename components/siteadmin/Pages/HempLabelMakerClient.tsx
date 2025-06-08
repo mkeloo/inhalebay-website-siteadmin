@@ -31,7 +31,7 @@ const WARNINGS =
 export default function HempLabelMaker() {
     const [labCertificates, setLabCertificates] = useState<HempLabCertificates[]>([]);
     const [certificatesURL, setCertificatesURL] = useState<string>("");
-    const [productWeight, setProductWeight] = useState("1g");
+    const [productWeight, setProductWeight] = useState("1gm");
     const [selectedProductUrl, setSelectedProductUrl] = useState("");
     const [selectedProduct, setSelectedProduct] = useState("");
     const [qrValue, setQrValue] = useState("");
