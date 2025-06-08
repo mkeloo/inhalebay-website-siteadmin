@@ -13,53 +13,60 @@ import {
     SelectItem,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { toPng } from "html-to-image";
-import { IndividualLabelPreview } from "@/components/siteadmin/LabelMaker/individualLabelPreview";
-// import inhalebaylogo from "@/assets/InhaleBayLogo.svg";
-import inhalebaylogo from "@/assets/InhaleBayLogoInvert.webp";
-import { fetchAllHempLabCertificates, HempLabCertificates } from "@/app/actions/hempLabCOA";
 import { Input } from "@/components/ui/input";
+import { toPng } from "html-to-image";
+import inhalebaylogo from "@/assets/InhaleBayLogoInvert.webp";
+import {
+    fetchAllHempLabCertificates,
+    fetchCertificatesURL,
+    HempLabCertificates,
+} from "@/app/actions/hempLabCOA";
+import { IndividualLabelPreview } from "@/components/siteadmin/LabelMaker/individualLabelPreview";
 
-
-const BACKUP_GOOGLE_DOC_URL = "https://docs.google.com/document/d/19UBrebsqHlbk18JM5jtZZcJCZLVf6m-ZOR-z42GWTrU/edit?usp=sharing";
-
+const BACKUP_GOOGLE_DOC_URL =
+    "https://docs.google.com/document/d/19UBrebsqHlbk18JM5jtZZcJCZLVf6m-ZOR-z42GWTrU/edit?usp=sharing";
 const WARNINGS =
     "Warning: Keep out of reach of children.";
 
-
 export default function HempLabelMaker() {
     const [labCertificates, setLabCertificates] = useState<HempLabCertificates[]>([]);
+    const [certificatesURL, setCertificatesURL] = useState<string>("");
     const [productWeight, setProductWeight] = useState("1g");
     const [selectedProductUrl, setSelectedProductUrl] = useState("");
     const [selectedProduct, setSelectedProduct] = useState("");
-    const [docUrl, setDocUrl] = useState(BACKUP_GOOGLE_DOC_URL);  // <-- new state
+    const [qrValue, setQrValue] = useState("");
+    const [docUrl, setDocUrl] = useState(BACKUP_GOOGLE_DOC_URL);
     const [searchTerm, setSearchTerm] = useState("");
 
-    // fixed label size
+    const labelRef = useRef<HTMLDivElement>(null);
     const LABEL_WIDTH = 4;
     const LABEL_HEIGHT = 1;
 
-    const labelRef = useRef<HTMLDivElement>(null);
-
-    // load lab certs
     useEffect(() => {
         (async () => {
-            const { success, data } = await fetchAllHempLabCertificates();
-            if (success) setLabCertificates(data);
+            const [certRes, url] = await Promise.all([
+                fetchAllHempLabCertificates(),
+                fetchCertificatesURL(),
+            ]);
+
+            if (certRes.success) setLabCertificates(certRes.data);
+            setCertificatesURL(url);
         })();
     }, []);
 
     function handleProductSelection(fileUrl: string, name: string) {
         setSelectedProductUrl(fileUrl);
         setSelectedProduct(name);
+        // build full URL for QR
+        setQrValue(`${certificatesURL}${fileUrl}`);
     }
 
-    // download the single label as PNG
     async function downloadLabel() {
         if (!labelRef.current) return;
-        const dataUrl = await toPng(labelRef.current);
+        const dataUrl = await toPng(labelRef.current, { pixelRatio: 4 });
         const link = document.createElement("a");
-        link.download = `${selectedProduct?.replace(/\s+/g, "-").toLowerCase() || "label"}.png`;
+        link.download =
+            `${selectedProduct?.replace(/\s+/g, "-").toLowerCase() || "label"}.png`;
         link.href = dataUrl;
         link.click();
     }
@@ -173,7 +180,7 @@ export default function HempLabelMaker() {
                             id="preview-label"
                             productName={selectedProduct || "Product Name THCA Flower"}
                             weight={productWeight}
-                            qrValue={selectedProductUrl}
+                            qrValue={qrValue}
                             logoSrc={inhalebaylogo.src}
                             warningText={WARNINGS}
                         />

@@ -74,18 +74,21 @@ export const IndividualLabelPreview = React.forwardRef<
                 <div className="flex-shrink-0">
                     <QRCode
                         value={qrValue}
-                        size={60}
+                        size={400}            // generate high-res SVG
                         ecLevel="H"
-                        qrStyle="dots"
+                        qrStyle="squares"     // square modules for reliability
                         fgColor="#000000"
                         bgColor="#FFFFFF"
-                        style={{ borderRadius: 10, border: "2px solid #000000" }}
-                        quietZone={5}
+                        quietZone={8}         // larger white border
                         eyeRadius={[
                             { outer: 12, inner: 4 },
                             { outer: 12, inner: 4 },
                             { outer: 12, inner: 4 },
                         ]}
+                        style={{
+                            width: "0.75in",    // ~0.75" square on paper
+                            height: "0.75in",
+                        }}
                     />
                 </div>
             </Card>
