@@ -31,7 +31,7 @@ const WARNINGS =
 export default function HempLabelMaker() {
     const [labCertificates, setLabCertificates] = useState<HempLabCertificates[]>([]);
     const [certificatesURL, setCertificatesURL] = useState<string>("");
-    const [productWeight, setProductWeight] = useState("1gm");
+    const [productWeight, setProductWeight] = useState("1 g");
     const [selectedProductUrl, setSelectedProductUrl] = useState("");
     const [selectedProduct, setSelectedProduct] = useState("");
     const [qrValue, setQrValue] = useState("");
@@ -104,8 +104,8 @@ export default function HempLabelMaker() {
                                     <SelectValue placeholder="Select weight" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="1g">1g</SelectItem>
-                                    <SelectItem value="4g">4g</SelectItem>
+                                    <SelectItem value="1 g">1 g</SelectItem>
+                                    <SelectItem value="4 g">4 g</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -149,7 +149,7 @@ export default function HempLabelMaker() {
                                     const cert = labCertificates.find((c) => c.file_url === fileUrl);
                                     if (cert) handleProductSelection(fileUrl, cert.name);
                                 }}
-                                className="space-y-2"
+                                className="space-y-1"
                             >
                                 {labCertificates
                                     .filter((cert) =>
@@ -158,7 +158,7 @@ export default function HempLabelMaker() {
                                     .map((cert) => (
                                         <div key={cert.id} className="flex items-center gap-2">
                                             <RadioGroupItem value={cert.file_url} id={`product-${cert.id}`} />
-                                            <Label htmlFor={`product-${cert.id}`} className="cursor-pointer">
+                                            <Label htmlFor={`product-${cert.id}`} className="cursor-pointer pt-1.5">
                                                 {cert.name}
                                             </Label>
                                         </div>

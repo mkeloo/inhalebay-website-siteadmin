@@ -37,10 +37,11 @@ export const IndividualLabelPreview = React.forwardRef<
         },
         ref
     ) => {
-        // Split productName so any "THCA…" part wraps to the next line
-        const match = productName.match(/(.*?)(THCA.*)/i);
+        // split off any "THCA Flower" or "THCA Snowcaps" (case-insensitive)
+        const match = productName.match(/(.*?)\s*(THCA\s+(?:Flower|Snowcaps))/i);
         const firstLine = match ? match[1].trim() : productName;
         const secondLine = match ? match[2].trim() : "";
+
 
         return (
             <Card
@@ -52,7 +53,7 @@ export const IndividualLabelPreview = React.forwardRef<
                 style={{ width: LABEL_WIDTH_PX, height: LABEL_HEIGHT_PX }}
             >
                 <div className="w-20 h-full flex flex-col items-center justify-between px-1">
-                    <div className="flex flex-col items-center justify-center h-full">
+                    <div className="flex flex-col items-center justify-start h-full pt-1">
                         {/* 1) Logo */}
                         <div className="flex-shrink-0 w-[60px] h-auto px-1.5">
                             <img
@@ -62,38 +63,37 @@ export const IndividualLabelPreview = React.forwardRef<
                             />
                         </div>
 
-                        <p className="text-[8px] mt-[2px] leading-tight text-black">
-                            <span className="font-bold font-mono">Inhale Bay</span>
-                            <br />
-                            {/* <span className="font-bold font-mono">Smoke Shop</span> */}
-                            {/* <br /> */}
-                            {/* Website as plain text */}
-                            <span className="text-[6px] font-mono">inhalebaysmokeshop.com</span>
+                        <p className="w-full flex flex-col  mt-[2.5px] leading-tight text-black">
+                            <span className="text-[9px] font-bold font-mono">Inhale Bay</span>
+                            <span className="text-[7px] font-bold font-mono">Smoke Shop</span>
                         </p>
+
+
                     </div>
+
+                    {/* Website as plain text */}
+                    <span className="text-[6px] font-mono font-semibold tracking-tight mb-[0.5px]">inhalebaysmokeshop.com</span>
                 </div>
 
                 {/* 2) Center content */}
-                <div className="w-full px-2 text-center relative">
+                <div className="w-full h-full text-center relative flex flex-col items-center justify-between px-1 pt-1">
 
 
-                    {/* 21+ Label */}
-                    {/* <div className="absolute -top-5 right-1 flex justify-center mt-1">
-                        <div className="w-5 h-5 rounded-full border-2 border-red-500 flex items-center justify-center">
-                            <span className="text-[7px] font-bold tracking-tighter">21+</span>
-                        </div>
-                    </div> */}
 
 
                     <h4 className="font-bold text-sm leading-tight text-black">
-                        {firstLine}
-                        <span className="text-xs font-medium">
-                            {secondLine && <><br />{secondLine}</>}
-                            <span className="text-xs leading-snug text-black mx-2">{weight}</span>
+                        <span>
+                            {firstLine}
                         </span>
+                        <span className="text-xs font-medium w-full">
+                            {secondLine && <><br />{secondLine}</>}
+
+                        </span>
+
+
                     </h4>
 
-                    <p className="text-[8px] mt-1 leading-tight text-black">
+                    <p className="text-[8px] mb-1 leading-tight text-black">
                         {warningText}
                     </p>
                 </div>
@@ -101,9 +101,11 @@ export const IndividualLabelPreview = React.forwardRef<
                 {/* 3) QR */}
                 <div className="h-full w-auto flex flex-col items-center justify-between px-1 pb-1">
                     {/* 21+ Label */}
-                    <div className="flex justify-center mt-1">
-                        {/* <span className="text-[7px] font-bold text-black mx-2 py-1.5">{weight}</span> */}
+                    <div className="w-full flex justify-between mt-1">
 
+                        <span className="text-xs font-bold leading-snug text-black mt-[0.5px] tracking-tighter">
+                            {weight}
+                        </span>
 
                         <div className="w-5 h-5 rounded-full border-2 border-red-500 flex items-center justify-center">
                             <span className="text-[7px] font-bold tracking-tighter">21+</span>
@@ -111,8 +113,8 @@ export const IndividualLabelPreview = React.forwardRef<
                     </div>
 
 
-                    <p className="text-[8px] mb-[0.5px] leading-tight text-black">
-                        <span className="text-[8px]">Lab Report</span>
+                    <p className="text-[8px] mt-[2px] leading-tight text-black">
+                        <span className="text-[8px] italic">Lab Report</span>
                     </p>
 
 
