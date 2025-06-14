@@ -22,6 +22,7 @@ import {
     HempLabCertificates,
 } from "@/app/actions/hempLabCOA";
 import { IndividualLabelPreview } from "@/components/siteadmin/LabelMaker/individualLabelPreview";
+import { VerticalLabelPreview } from "../LabelMaker/VerticalLabelPreview";
 
 const BACKUP_GOOGLE_DOC_URL =
     "https://docs.google.com/document/d/19UBrebsqHlbk18JM5jtZZcJCZLVf6m-ZOR-z42GWTrU/edit?usp=sharing";
@@ -37,6 +38,8 @@ export default function HempLabelMaker() {
     const [searchTerm, setSearchTerm] = useState("");
 
     const labelRef = useRef<HTMLDivElement>(null);
+    const secondLabelRef = useRef<HTMLDivElement>(null);
+
     const LABEL_WIDTH = 4;
     const LABEL_HEIGHT = 1;
 
@@ -64,7 +67,17 @@ export default function HempLabelMaker() {
         const dataUrl = await toPng(labelRef.current, { pixelRatio: 4 });
         const link = document.createElement("a");
         link.download =
-            `${selectedProduct?.replace(/\s+/g, "-").toLowerCase() || "label"}.png`;
+            `${selectedProduct?.replace(/\s+/g, "-").toLowerCase() || "second-label"}.png`;
+        link.href = dataUrl;
+        link.click();
+    }
+
+    async function downloadSecondLabel() {
+        if (!secondLabelRef.current) return;
+        const dataUrl = await toPng(secondLabelRef.current, { pixelRatio: 4 });
+        const link = document.createElement("a");
+        link.download =
+            `${selectedProduct?.replace(/\s+/g, "-").toLowerCase()}-second-label.png`;
         link.href = dataUrl;
         link.click();
     }
@@ -183,9 +196,23 @@ export default function HempLabelMaker() {
                         />
                     </div>
                 </div>
-                <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <div className="w-full flex flex-col items-center justify-center p-6 border rounded-lg bg-gray-400 shadow-md  ">
+                    <div ref={secondLabelRef} className="inline-block">
+                        <VerticalLabelPreview
+                            id="preview-label"
+                            productName={selectedProduct || "Product Name THCA Flower"}
+                            weight={productWeight}
+                            qrValue={qrValue}
+                            logoSrc={inhalebaylogo.src}
+                        />
+                    </div>
+                </div>
+                <div className="flex flex-col justify-center gap-4">
                     <Button onClick={downloadLabel} disabled={!selectedProductUrl}>
                         Download Label Image
+                    </Button>
+                    <Button onClick={downloadSecondLabel} disabled={!selectedProductUrl}>
+                        Download Second Label Image
                     </Button>
                     <a
                         href={docUrl || BACKUP_GOOGLE_DOC_URL}
