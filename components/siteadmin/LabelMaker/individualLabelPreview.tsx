@@ -3,7 +3,6 @@ import React from "react";
 import { Card } from "@/components/ui/card";
 import { QRCode } from "react-qrcode-logo";
 import type { DraggableSyntheticListeners } from "@dnd-kit/core";
-import CannabisWarning from "@/assets/hempLabelMaker/CannabisWarning.webp";
 
 export interface IndividualLabelPreviewProps {
     id: string;
@@ -11,15 +10,18 @@ export interface IndividualLabelPreviewProps {
     weight: string;
     qrValue: string;
     logoSrc: string;
-    warningText: string;
     listeners?: DraggableSyntheticListeners;
     attributes?: React.HTMLAttributes<HTMLDivElement>;
 }
 
 const INCH_TO_PX = 96;
-const CONTENT_WIDTH_PX = 3 * INCH_TO_PX;   // your real content area
+const CONTENT_WIDTH_PX = 3.60 * INCH_TO_PX;   // your real content area
 const OUTER_WIDTH_PX = 3.85 * INCH_TO_PX;   // full sticker width
 const LABEL_HEIGHT_PX = 0.90 * INCH_TO_PX;   // full sticker height
+
+const WARNINGS =
+    "Warning: Keep out of reach of children. Not Intended For Ingestion – Do Not Eat.";
+
 
 export const IndividualLabelPreview = React.forwardRef<
     HTMLDivElement,
@@ -32,7 +34,6 @@ export const IndividualLabelPreview = React.forwardRef<
             weight,
             qrValue,
             logoSrc,
-            warningText,
             listeners,
             attributes,
         },
@@ -100,7 +101,7 @@ export const IndividualLabelPreview = React.forwardRef<
                         </h4>
 
                         <p className="text-[8px] mb-1 leading-tight text-black">
-                            {warningText}
+                            {WARNINGS}
                         </p>
                     </div>
 

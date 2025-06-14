@@ -25,8 +25,6 @@ import { IndividualLabelPreview } from "@/components/siteadmin/LabelMaker/indivi
 
 const BACKUP_GOOGLE_DOC_URL =
     "https://docs.google.com/document/d/19UBrebsqHlbk18JM5jtZZcJCZLVf6m-ZOR-z42GWTrU/edit?usp=sharing";
-const WARNINGS =
-    "Warning: Keep out of reach of children.";
 
 export default function HempLabelMaker() {
     const [labCertificates, setLabCertificates] = useState<HempLabCertificates[]>([]);
@@ -182,7 +180,6 @@ export default function HempLabelMaker() {
                             weight={productWeight}
                             qrValue={qrValue}
                             logoSrc={inhalebaylogo.src}
-                            warningText={WARNINGS}
                         />
                     </div>
                 </div>
