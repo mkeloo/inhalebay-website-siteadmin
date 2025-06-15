@@ -36,6 +36,8 @@ export default function HempLabelMaker() {
     const [qrValue, setQrValue] = useState("");
     const [docUrl, setDocUrl] = useState(BACKUP_GOOGLE_DOC_URL);
     const [searchTerm, setSearchTerm] = useState("");
+    // new state for rotation toggle
+    const [verticalRotated, setVerticalRotated] = useState(false);
 
     const labelRef = useRef<HTMLDivElement>(null);
     const secondLabelRef = useRef<HTMLDivElement>(null);
@@ -196,12 +198,22 @@ export default function HempLabelMaker() {
                         />
                     </div>
                 </div>
-                <div className="w-full flex flex-col items-center justify-center p-6 border rounded-lg bg-gray-400 shadow-md  ">
-                    <div ref={secondLabelRef} className="inline-block">
+                {/* Vertical Preview with Rotate Toggle */}
+                <div className="w-full flex flex-col items-center justify-center p-6 border rounded-lg bg-gray-400 shadow-md">
+                    <Button className="bg-blue-800 text-white hover:bg-sky-500" onClick={() => setVerticalRotated(r => !r)}>
+                        {verticalRotated ? 'Vertical' : 'Horizontal'}
+                    </Button>
+                    <div
+                        ref={secondLabelRef}
+                        className={`inline-block transform transition-transform duration-300 mt-4 ${verticalRotated ? '-rotate-90' : 'rotate-0'
+                            }`}
+                    >
                         <VerticalLabelPreview
                             id="preview-label"
                             productName={selectedProduct || "Product Name THCA Flower"}
                             weight={productWeight}
+                            batchNumber={labCertificates.find(cert => cert.file_url === selectedProductUrl)?.batch_number}
+                            thcaMgPerGram={labCertificates.find(cert => cert.file_url === selectedProductUrl)?.thca_mg_per_gram}
                             qrValue={qrValue}
                             logoSrc={inhalebaylogo.src}
                         />
