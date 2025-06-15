@@ -85,10 +85,10 @@ export const VerticalLabelPreview = React.forwardRef<
                                 <img
                                     src={logoSrc}
                                     alt="Logo"
-                                    className="w-[45px] h-auto"
+                                    className="w-[47px] h-auto"
                                 />
                                 <div className="w-full text-[6px] text-center">
-                                    <p className="text-[6.5px] font-bold w-full flex flex-col items-center mt-[2px] mb-[4px] leading-[7px]">
+                                    <p className="text-[6.5px] font-bold w-full flex flex-col items-center mt-[2px] mb-[3px] leading-[7px]">
                                         {/* <span>Inhale Bay</span> */}
                                         <span>Smoke Shop</span>
                                     </p>
@@ -135,7 +135,7 @@ export const VerticalLabelPreview = React.forwardRef<
                             </div>
                         </div>
 
-                        <div className="w-full h-fit bg-emerald-300 flex flex-col items-center justify-between  border-t-[1px] border-black">
+                        <div className="w-full h-fit bg-emerald-3000 flex flex-col items-center justify-between  border-t-[1px] border-black">
                             {/* QR & Batch/THCA/Exp */}
                             <div className="w-full h-full flex flex-col items-center">
                                 <div className="h-full flex flex-col items-center justify-center mt-1 mb-[2.5px]">
@@ -148,17 +148,22 @@ export const VerticalLabelPreview = React.forwardRef<
                                         bgColor="#FFFFFF"
                                         quietZone={8}
                                         eyeRadius={[{ outer: 12, inner: 4 }, { outer: 12, inner: 4 }, { outer: 12, inner: 4 }]}
-                                        style={{ width: "0.38in", height: "0.38in" }}
+                                        style={{ width: "0.40in", height: "0.40in" }}
                                     />
                                     <p className="text-[5px] italic mt-[1px]">Certificate Of Analysis</p>
 
                                 </div>
 
                                 {/* Batch/Exp placeholders */}
-                                <p className="h-full text-[5px] leading-tight flex flex-col items-start">
-                                    <span className="">Batch#: {batchNumber}</span>
-                                    <span className="">THCA: {thcaMgPerGram} mg per serving</span>
-                                    <span className="">Exp: {getExpirationDate()}</span>
+                                <p className="w-full h-full text-[5px] text-left leading-tight grid grid-cols-[auto_1fr]">
+                                    <span className="font-semibold">Batch:</span>
+                                    <span className="justify-self-end tracking-tighter">{batchNumber}</span>
+
+                                    <span className="font-semibold">THCA:</span>
+                                    <span className="justify-self-end">{thcaMgPerGram} mg per serving</span>
+
+                                    <span className="font-semibold">Exp:</span>
+                                    <span className="justify-self-end">{getExpirationDate()}</span>
                                 </p>
                             </div>
 
