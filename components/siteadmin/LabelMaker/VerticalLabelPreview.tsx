@@ -23,8 +23,18 @@ const OUTER_WIDTH_PX_VERTICAL = 0.90 * INCH_TO_PX; // ~0.90" wide
 const LABEL_HEIGHT_PX_VERTICAL = 3.85 * INCH_TO_PX; // ~3.85" tall
 const CONTENT_HEIGHT_PX_VERTICAL = 3.60 * INCH_TO_PX; // ~3.60" content span
 
-const WARNINGS =
-    "Warning: Keep out of reach of children. Not Intended For Ingestion – Do Not Eat.";
+// const WARNINGS = [
+//     "Warning: Keep out of reach of children.",
+//     "Not Intended For Ingestion – Do Not Eat."
+// ];
+
+const WARNINGS = [
+    "Not Intended For Ingestion – Do Not Eat.",
+    "Keep away from children."
+];
+
+const ounceEquivalent = (grams: number) =>
+    (grams * 0.035274).toFixed(2) + " oz";
 
 export const VerticalLabelPreview = React.forwardRef<
     HTMLDivElement,
@@ -69,7 +79,20 @@ export const VerticalLabelPreview = React.forwardRef<
                         </div>
 
                         {/* Warnings */}
-                        <p className="text-[6px] text-left mt-[5px]">{WARNINGS}</p>
+                        <p className="text-[6px] text-left mt-[5px]">
+                            {WARNINGS.map((line, i) => (
+                                <React.Fragment key={i}>
+                                    {line}
+                                    <br />
+                                </React.Fragment>
+                            ))}
+                        </p>
+
+                        <div className="text-[6px] text-center mt-1">
+                            <div>Net Wt: {weight} ({ounceEquivalent(parseFloat(weight))})</div>
+                            <div>Serving Size: {weight}</div>
+                            <div>Servings per Container: 1</div>
+                        </div>
                     </div>
 
                     {/* Main Product Identity */}
@@ -96,13 +119,15 @@ export const VerticalLabelPreview = React.forwardRef<
 
 
 
-                        {/* Distributor & Packer */}
+                        {/* Company Address */}
                         <div className="text-[6px] text-left">
                             {/* <div>Distributed by: Discount Pharms, Anytown FL</div> */}
                             {/* <div>Permit # HEMP-XXXX</div> */}
                             <div>Inhale Bay Smoke Shop</div>
-                            <div>1234 Smoke St.</div>
-                            <div>Anytown, FL 12345</div>
+                            <p>
+                                5751 N Main St, #108<br />
+                                Jacksonville, FL 32208
+                            </p>
                         </div>
 
                         {/* QR Code & Label */}
@@ -121,9 +146,14 @@ export const VerticalLabelPreview = React.forwardRef<
                             />
 
                             {/* Batch/Exp placeholders */}
-                            <div className="text-[6px] text-center">
+                            {/* <div className="text-[6px] text-center">
                                 <div>Batch#: {batchNumber}</div>
                                 <div>THCA: {thcaMgPerGram ? `${thcaMgPerGram} mg/g` : "N/A"}</div>
+                                <div>Exp: {getExpirationDate()}</div>
+                            </div> */}
+                            <div className="text-[6px] text-center">
+                                <div>Batch#: {batchNumber}</div>
+                                <div>THCA: {thcaMgPerGram} mg per serving</div>
                                 <div>Exp: {getExpirationDate()}</div>
                             </div>
                         </div>
