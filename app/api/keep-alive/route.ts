@@ -4,9 +4,15 @@ import { createClient } from "@/utils/supabase/server";
 
 // TEST SCHEDULE: runs every minute (Vercel only supports minute-level granularity)
 // Change back to "0 0 */4 * *" for production (every 4 days at midnight UTC)
+// export const config = {
+//     runtime: "edge",
+//     schedule: "*/1 * * * *",
+// };
+
 export const config = {
     runtime: "edge",
-    schedule: "*/1 * * * *",
+    // Schedule: every day at 5pm UTC
+    schedule: "0 17 * * *",
 };
 
 export async function GET() {
