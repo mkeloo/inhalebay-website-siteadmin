@@ -13,6 +13,8 @@ export type HempLabCertificates = {
     created_at?: string; // Optional, as it has a default value
     updated_at?: string; // Optional, as it has a default value
     option_name?: string; // UUID, optional due to foreign key reference
+    batch_number?: string; // Optional, as it can be null
+    thca_mg_per_gram?: number; // Optional, as it can be null
 };
 
 export async function fetchAllHempLabCertificates(): Promise<{

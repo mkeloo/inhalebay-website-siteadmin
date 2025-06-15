@@ -151,6 +151,8 @@ export default function HempCertificateOfAnalysisClient() {
                                 <TableHead className="w-16 border-r">ID</TableHead>
                                 <TableHead className="border-r">Name</TableHead>
                                 <TableHead className="border-r">File Name</TableHead>
+                                <TableHead className="border-r">Batch/Lot</TableHead>
+                                <TableHead className="border-r">THCA mg/g</TableHead>
                                 <TableHead className="border-r text-center">Actions</TableHead>
                                 <TableHead className="border-r">File Type</TableHead>
                                 <TableHead className="border-r">File Size</TableHead>
@@ -171,6 +173,8 @@ export default function HempCertificateOfAnalysisClient() {
                                         <TableCell className="border-r truncate">{cert.serial_id}</TableCell>
                                         <TableCell className="border-r truncate">{cert.name}</TableCell>
                                         <TableCell className="border-r truncate">{cert.file_name}</TableCell>
+                                        <TableCell className="border-r">{cert.batch_number}</TableCell>
+                                        <TableCell className="border-r">{cert.thca_mg_per_gram?.toFixed(2) || '—'}</TableCell>
                                         <TableCell className="border-r text-center">
                                             <a
                                                 href={`${certificatesURL}${cert.file_url}`}
