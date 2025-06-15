@@ -2,20 +2,9 @@
 import React, { useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { QRCode } from "react-qrcode-logo";
-import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 import { getExpirationDate } from "@/utils/functions";
+import { IndividualLabelPreviewProps } from "@/lib/types";
 
-export interface IndividualLabelPreviewProps {
-    id: string;
-    productName: string;
-    weight: string;
-    batchNumber?: string;
-    thcaMgPerGram?: number;
-    qrValue: string;
-    logoSrc: string;
-    listeners?: DraggableSyntheticListeners;
-    attributes?: React.HTMLAttributes<HTMLDivElement>;
-}
 
 const INCH_TO_PX = 96;
 const OUTER_WIDTH_PX_VERTICAL = 0.90 * INCH_TO_PX;
@@ -24,7 +13,7 @@ const CONTENT_HEIGHT_PX_VERTICAL = 3.60 * INCH_TO_PX;
 const VERTICAL_MARGIN = (LABEL_HEIGHT_PX_VERTICAL - CONTENT_HEIGHT_PX_VERTICAL) / 2;
 
 const WARNINGS = [
-    "Not Intended For Ingestion.",
+    "Not Intended For Ingestion",
     "Do Not Eat.",
     "Keep away from children."
 ];
@@ -61,11 +50,11 @@ export const VerticalLabelPreview = React.forwardRef<
                 <div ref={wrapperRef} className="w-full h-full">
                     {/* Indicator lines for content bounds */}
                     <div
-                        className="absolute inset-x-0 border-t border-red-500"
+                        className="absolute inset-x-0 border-t border-red-5000"
                         style={{ top: VERTICAL_MARGIN }}
                     />
                     <div
-                        className="absolute inset-x-0 border-b border-red-500"
+                        className="absolute inset-x-0 border-b border-red-5000"
                         style={{ top: VERTICAL_MARGIN + CONTENT_HEIGHT_PX_VERTICAL }}
                     />
 
@@ -77,10 +66,10 @@ export const VerticalLabelPreview = React.forwardRef<
                             top: VERTICAL_MARGIN
                         }}
                     >
-                        <div className="w-full h-fit bg-yellow-2000">
+                        <div className="w-full h-fit bg-yellow-200 border-b-[1px] border-black">
 
                             {/* Logo & Address */}
-                            <div className="w-full h-full flex flex-col items-center justify-center rotate-90 mb-4 border-r-[1px] border-black">
+                            <div className="w-full h-full flex flex-col items-center justify-center rotate-90 mb-4">
                                 <img
                                     src={logoSrc}
                                     alt="Logo"
@@ -108,34 +97,59 @@ export const VerticalLabelPreview = React.forwardRef<
 
                         <div className="w-full h-full flex flex-col items-center justify-center bg-indigo-3000">
                             {/* Main Product Name & 21+ */}
-                            <div className="w-full h-fit flex flex-col items-center justify-center rotate-90">
+                            <div className="w-full h-full flex flex-col items-center justify-center rotate-90 bg-amber-500">
 
-                                <h4 className="w-full h-full font-bold text-center leading-tight block whitespace-nowrap">
-                                    <span className="text-[14px]">{firstLine}</span>
-                                    {secondLine && (
-                                        <span className="block text-[10px] font-medium">{secondLine}</span>
-                                    )}
-                                </h4>
+                                <div className="w-36 flex flex-col items-center justify-center bg-sky-400"
+                                    style={{
+                                        height: OUTER_WIDTH_PX_VERTICAL,
+                                    }}
+                                >
+                                    <div className="w-full h-1/2 flex flex-col items-center justify-center">
+                                        <p className="text-[7px] leading-0 mt-1 mb-[3px]">Inhale Bay Smoke Shop</p>
 
-                                <div className="w-full h-full flex flex-row items-center mt-1 ">
-                                    {/* Weights */}
-                                    <div className="w-full h-full text-[6px] text-left leading-[7px]">
-                                        <p>Net Wt: {weight} ({ounceEquivalent(parseFloat(weight))})</p>
-                                        <p>Serv Size: {weight} </p>
-                                        <p>Qty: 1</p>
+                                        {/* Product Name */}
+                                        <h4 className="w-full font-bold text-center leading-tight block whitespace-nowrap">
+                                            <span className="text-[14px]">{firstLine}</span>
+                                            {secondLine && (
+                                                <span className="block text-[10px] font-medium leading-[7px]">{secondLine}</span>
+                                            )}
+                                        </h4>
                                     </div>
 
-                                    {/* 21+ Indicator */}
-                                    <div className="flex items-center gap-1 mt-1">
-                                        <div className="w-5 h-4 rounded border-2 border-red-500 flex items-center justify-center">
-                                            <span className="text-[7px] font-bold tracking-tighter">21+</span>
+                                    <div className="w-full h-1/2 flex flex-col items-center justify-center">
+                                        <div className="w-full h-full flex flex-row items-center justify-between mt-1 ">
+                                            {/* Weights */}
+                                            <div className="w-1/2 h-full text-[6px] text-left leading-[7px] flex flex-col items-start justify-center">
+                                                <p>Net Wt: <span className="tracking-[0.05px]">{weight}</span> ({ounceEquivalent(parseFloat(weight))})</p>
+                                                <p>Serving Size: <span className="tracking-[0.05px]">{weight}</span> </p>
+                                                <p>Qty: 1</p>
+                                            </div>
+
+                                            {/* 21+ Indicator */}
+                                            <div className="w-1/2 flex items-center justify-end gap-1">
+                                                <div className="w-5 h-5 rounded-full border-2 border-red-500 flex items-center justify-center">
+                                                    <span className="text-[7px] font-bold tracking-tighter">21+</span>
+                                                </div>
+                                            </div>
                                         </div>
+
+                                        {/* Warning */}
+                                        <div className="text-[5.5px] text-center leading-tight mb-[2px]">
+                                            {WARNINGS.slice(0, -1).map((line, i, arr) => (
+                                                <React.Fragment key={i}>
+                                                    {line}
+                                                    {i < arr.length - 1 && " - "}
+                                                </React.Fragment>
+                                            ))}
+                                        </div>
+
+
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="w-full h-fit bg-emerald-3000 flex flex-col items-center justify-between  border-t-[1px] border-black">
+                        <div className="w-full h-fit bg-emerald-300 flex flex-col items-center justify-between  border-t-[1px] border-black">
                             {/* QR & Batch/THCA/Exp */}
                             <div className="w-full h-full flex flex-col items-center">
                                 <div className="h-full flex flex-col items-center justify-center mt-1 mb-[2.5px]">
