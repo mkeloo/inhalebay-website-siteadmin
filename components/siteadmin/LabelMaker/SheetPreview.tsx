@@ -142,7 +142,6 @@ export function SheetPreview({
                                             weight={weight}
                                             qrValue={qrValue}
                                             logoSrc={logoSrc}
-                                            warningText={warningText}
                                         />
                                     </DraggableLabel>
                                 )}

@@ -162,6 +162,7 @@ export const VerticalLabelPreview = React.forwardRef<
                                 </div>
                             </div>
                         </div>
+                        {/* Centered Content Area ----------------------------- */}
 
                         <div className="w-full h-fit bg-emerald-3000 flex flex-col items-center justify-between  border-t-[1px] border-black">
                             {/* QR & Batch/THCA/Exp */}
@@ -210,8 +211,6 @@ export const VerticalLabelPreview = React.forwardRef<
                         </div>
                     </div>
 
-
-                    {/* Centered content area ----------------------------- */}
 
                 </div>
             </Card >
