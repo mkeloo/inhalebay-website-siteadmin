@@ -41,6 +41,8 @@ export default function HempLabelMaker() {
 
     const labelRef = useRef<HTMLDivElement>(null);
     const secondLabelRef = useRef<HTMLDivElement>(null);
+    const cardRef = useRef<HTMLDivElement>(null);
+
 
     const LABEL_WIDTH = 4;
     const LABEL_HEIGHT = 1;
@@ -75,15 +77,38 @@ export default function HempLabelMaker() {
     }
 
     async function downloadSecondLabel() {
-        if (!secondLabelRef.current) return;
-        const dataUrl = await toPng(secondLabelRef.current, { pixelRatio: 4 });
+        if (!cardRef.current) return;
+
+        // 1) Full vertical snapshot of the card (3.85" high)
+        const verticalDataUrl = await toPng(cardRef.current, { pixelRatio: 4 });
+
+        // 2) Load into an offscreen Image
+        const img = new Image();
+        img.src = verticalDataUrl;
+        await img.decode();
+
+        // 3) Create canvas for horizontal (width=img.height, height=img.width)
+        const canvas = document.createElement("canvas");
+        canvas.width = img.height;
+        canvas.height = img.width;
+        const ctx = canvas.getContext("2d")!;
+
+        // 4) Rotate –90° and draw
+        ctx.translate(0, canvas.height);
+        ctx.rotate(-Math.PI / 2);
+        ctx.drawImage(img, 0, 0);
+
+        // 5) Export and download
+        const finalDataUrl = canvas.toDataURL("image/png");
         const link = document.createElement("a");
-        link.download =
-            `${selectedProduct?.replace(/\s+/g, "-").toLowerCase()}-second-label.png`;
-        link.href = dataUrl;
+        link.download = `${selectedProduct
+            ?.replace(/\s+/g, "-")
+            .toLowerCase()}-label.png`;
+        link.href = finalDataUrl;
         link.click();
     }
 
+    // console.log("HempLabelMaker rendered with labCertificates:", qrValue, selectedProductUrl, selectedProduct);
     return (
         <div className="w-full space-y-8 max-w-screen-xl p-4 flex flex-col lg:flex-row items-start justify-center lg:justify-between gap-6">
             {/* Controls */}
@@ -210,6 +235,7 @@ export default function HempLabelMaker() {
                     >
                         <VerticalLabelPreview
                             id="preview-label"
+                            ref={cardRef}
                             productName={selectedProduct || "Product Name THCA Flower"}
                             weight={productWeight}
                             batchNumber={labCertificates.find(cert => cert.file_url === selectedProductUrl)?.batch_number}
