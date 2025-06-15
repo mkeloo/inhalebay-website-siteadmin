@@ -37,7 +37,7 @@ export default function HempLabelMaker() {
     const [docUrl, setDocUrl] = useState(BACKUP_GOOGLE_DOC_URL);
     const [searchTerm, setSearchTerm] = useState("");
     // new state for rotation toggle
-    const [verticalRotated, setVerticalRotated] = useState(false);
+    const [verticalRotated, setVerticalRotated] = useState(true);
 
     const labelRef = useRef<HTMLDivElement>(null);
     const secondLabelRef = useRef<HTMLDivElement>(null);
