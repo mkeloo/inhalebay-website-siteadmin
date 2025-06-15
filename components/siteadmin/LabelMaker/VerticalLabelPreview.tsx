@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { QRCode } from "react-qrcode-logo";
 import { getExpirationDate } from "@/utils/functions";
 import { IndividualLabelPreviewProps } from "@/lib/types";
-
+import wave from "@/public/svgs/wave-1.svg";
 
 const INCH_TO_PX = 96;
 const OUTER_WIDTH_PX_VERTICAL = 0.90 * INCH_TO_PX;
@@ -60,13 +60,13 @@ export const VerticalLabelPreview = React.forwardRef<
 
                     {/* Centered content area ----------------------------- */}
                     <div
-                        className="absolute inset-x-0 flex flex-col items-center justify-between overflow-hidden"
+                        className="absolute inset-x-0 flex flex-col items-center justify-between overflow-hidden bg-no-repeat bg-bottom"
                         style={{
                             height: CONTENT_HEIGHT_PX_VERTICAL,
-                            top: VERTICAL_MARGIN
+                            top: VERTICAL_MARGIN,
                         }}
                     >
-                        <div className="w-full h-fit bg-yellow-200 border-b-[1px] border-black">
+                        <div className="w-full h-fit bg-yellow-2000 border-b-[1px] border-black">
 
                             {/* Logo & Address */}
                             <div className="w-full h-full flex flex-col items-center justify-center rotate-90 mb-4">
@@ -86,7 +86,7 @@ export const VerticalLabelPreview = React.forwardRef<
                                     </p>
                                 </div>
 
-                                <div className="w-full text-[6px] text-center mt-[3px]">
+                                <div className="w-full text-[6px] text-center mt-[3px] tracking-wider font-medium">
                                     <p>inhalebaysmokeshop.com</p>
                                 </div>
 
@@ -95,23 +95,37 @@ export const VerticalLabelPreview = React.forwardRef<
 
                         </div>
 
-                        <div className="w-full h-full flex flex-col items-center justify-center bg-indigo-3000">
+                        {/* ------------------------ Center Content ------------------------ */}
+                        <div
+                            className="w-full h-full flex flex-col items-center justify-center"
+                            style={{
+                                background: `
+                                        conic-gradient(
+                                            from -30deg,
+                                            rgba(186,230,253,0.25) 0deg   100deg,   /* light sky blue */
+                                            rgba(56,189,248,0.25) 100deg 220deg,    /* sky blue */
+                                            rgba(2,132,199,0.25)  220deg 360deg     /* deep sky blue */
+                                        )
+                                `,
+                                backgroundSize: "100% 100%",
+                            }}
+                        >
                             {/* Main Product Name & 21+ */}
-                            <div className="w-full h-full flex flex-col items-center justify-center rotate-90 bg-amber-500">
+                            <div className="w-full h-full flex flex-col items-center justify-center rotate-90 blur-none">
 
-                                <div className="w-36 flex flex-col items-center justify-center bg-sky-400"
+                                <div className="w-36 flex flex-col items-center justify-center bg-sky-4000"
                                     style={{
                                         height: OUTER_WIDTH_PX_VERTICAL,
                                     }}
                                 >
                                     <div className="w-full h-1/2 flex flex-col items-center justify-center">
-                                        <p className="text-[7px] leading-0 mt-1 mb-[3px]">Inhale Bay Smoke Shop</p>
+                                        <p className="text-[7px] font-bold leading-0 mt-1 mb-[3px] tracking-wider">Inhale Bay Smoke Shop</p>
 
                                         {/* Product Name */}
                                         <h4 className="w-full font-bold text-center leading-tight block whitespace-nowrap">
                                             <span className="text-[14px]">{firstLine}</span>
                                             {secondLine && (
-                                                <span className="block text-[10px] font-medium leading-[7px]">{secondLine}</span>
+                                                <span className="block text-[9px] font-normal leading-[7px]">{secondLine}</span>
                                             )}
                                         </h4>
                                     </div>
@@ -120,9 +134,9 @@ export const VerticalLabelPreview = React.forwardRef<
                                         <div className="w-full h-full flex flex-row items-center justify-between mt-1 ">
                                             {/* Weights */}
                                             <div className="w-1/2 h-full text-[6px] text-left leading-[7px] flex flex-col items-start justify-center">
-                                                <p>Net Wt: <span className="tracking-[0.05px]">{weight}</span> ({ounceEquivalent(parseFloat(weight))})</p>
-                                                <p>Serving Size: <span className="tracking-[0.05px]">{weight}</span> </p>
-                                                <p>Qty: 1</p>
+                                                <p>Net Wt: <span className="tracking-[0.05px] font-bold">{weight} ({ounceEquivalent(parseFloat(weight))})</span> </p>
+                                                <p>Serving Size: <span className="tracking-[0.05px] font-bold">{weight}</span> </p>
+                                                <p>Qty: <span className="tracking-[0.05px] font-bold">1</span></p>
                                             </div>
 
                                             {/* 21+ Indicator */}
@@ -134,7 +148,7 @@ export const VerticalLabelPreview = React.forwardRef<
                                         </div>
 
                                         {/* Warning */}
-                                        <div className="text-[5.5px] text-center leading-tight mb-[2px]">
+                                        <div className="text-[5.5px] font-mono text-center leading-tight mb-[2px]">
                                             {WARNINGS.slice(0, -1).map((line, i, arr) => (
                                                 <React.Fragment key={i}>
                                                     {line}
@@ -149,7 +163,7 @@ export const VerticalLabelPreview = React.forwardRef<
                             </div>
                         </div>
 
-                        <div className="w-full h-fit bg-emerald-300 flex flex-col items-center justify-between  border-t-[1px] border-black">
+                        <div className="w-full h-fit bg-emerald-3000 flex flex-col items-center justify-between  border-t-[1px] border-black">
                             {/* QR & Batch/THCA/Exp */}
                             <div className="w-full h-full flex flex-col items-center">
                                 <div className="h-full flex flex-col items-center justify-center mt-1 mb-[2.5px]">
@@ -164,7 +178,7 @@ export const VerticalLabelPreview = React.forwardRef<
                                         eyeRadius={[{ outer: 12, inner: 4 }, { outer: 12, inner: 4 }, { outer: 12, inner: 4 }]}
                                         style={{ width: "0.40in", height: "0.40in" }}
                                     />
-                                    <p className="text-[5px] italic mt-[1px]">Certificate Of Analysis</p>
+                                    <p className="text-[5px] italic mt-[1px] font-bold">Certificate Of Analysis</p>
 
                                 </div>
 
@@ -200,7 +214,7 @@ export const VerticalLabelPreview = React.forwardRef<
                     {/* Centered content area ----------------------------- */}
 
                 </div>
-            </Card>
+            </Card >
         );
     }
 );
