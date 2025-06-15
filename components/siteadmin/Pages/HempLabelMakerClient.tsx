@@ -21,7 +21,7 @@ import {
     fetchCertificatesURL,
     HempLabCertificates,
 } from "@/app/actions/hempLabCOA";
-import { IndividualLabelPreview } from "@/components/siteadmin/LabelMaker/individualLabelPreview";
+// import { IndividualLabelPreview } from "@/components/siteadmin/LabelMaker/individualLabelPreview";
 import { VerticalLabelPreview } from "../LabelMaker/VerticalLabelPreview";
 
 const BACKUP_GOOGLE_DOC_URL =

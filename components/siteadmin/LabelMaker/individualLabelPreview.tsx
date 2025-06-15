@@ -2,17 +2,9 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { QRCode } from "react-qrcode-logo";
-import type { DraggableSyntheticListeners } from "@dnd-kit/core";
+import { IndividualLabelPreviewProps } from "@/lib/types";
 
-export interface IndividualLabelPreviewProps {
-    id: string;
-    productName: string;
-    weight: string;
-    qrValue: string;
-    logoSrc: string;
-    listeners?: DraggableSyntheticListeners;
-    attributes?: React.HTMLAttributes<HTMLDivElement>;
-}
+
 
 const INCH_TO_PX = 96;
 const CONTENT_WIDTH_PX = 3.60 * INCH_TO_PX;   // your real content area
