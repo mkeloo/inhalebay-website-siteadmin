@@ -61,11 +61,11 @@ export const VerticalLabelPreview = React.forwardRef<
                 <div ref={wrapperRef} className="w-full h-full">
                     {/* Indicator lines for content bounds */}
                     <div
-                        className="absolute inset-x-0 border-t border-red-5000"
+                        className="absolute inset-x-0 border-t border-red-500"
                         style={{ top: VERTICAL_MARGIN }}
                     />
                     <div
-                        className="absolute inset-x-0 border-b border-red-5000"
+                        className="absolute inset-x-0 border-b border-red-500"
                         style={{ top: VERTICAL_MARGIN + CONTENT_HEIGHT_PX_VERTICAL }}
                     />
 
