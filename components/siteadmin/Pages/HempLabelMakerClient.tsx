@@ -31,9 +31,9 @@ export default function HempLabelMaker() {
     const [labCertificates, setLabCertificates] = useState<HempLabCertificates[]>([]);
     const [certificatesURL, setCertificatesURL] = useState<string>("");
     const [productWeight, setProductWeight] = useState("1 g");
-    const [selectedProductUrl, setSelectedProductUrl] = useState("");
-    const [selectedProduct, setSelectedProduct] = useState("");
-    const [qrValue, setQrValue] = useState("");
+    const [selectedProductUrl, setSelectedProductUrl] = useState("Gorilla_Skunk_THCA_Flower_COA_9%3A24.pdf");
+    const [selectedProduct, setSelectedProduct] = useState("Gorilla Skunk THCA Flower");
+    const [qrValue, setQrValue] = useState("https://inhalebaycertificates.com/Gorilla_Skunk_THCA_Flower_COA_9%3A24.pdf");
     const [docUrl, setDocUrl] = useState(BACKUP_GOOGLE_DOC_URL);
     const [searchTerm, setSearchTerm] = useState("");
     // new state for rotation toggle
