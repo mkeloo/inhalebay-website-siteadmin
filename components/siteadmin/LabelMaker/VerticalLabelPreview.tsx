@@ -24,7 +24,8 @@ const CONTENT_HEIGHT_PX_VERTICAL = 3.60 * INCH_TO_PX;
 const VERTICAL_MARGIN = (LABEL_HEIGHT_PX_VERTICAL - CONTENT_HEIGHT_PX_VERTICAL) / 2;
 
 const WARNINGS = [
-    "Not Intended For Ingestion – Do Not Eat.",
+    "Not Intended For Ingestion.",
+    "Do Not Eat.",
     "Keep away from children."
 ];
 
@@ -68,81 +69,117 @@ export const VerticalLabelPreview = React.forwardRef<
                         style={{ top: VERTICAL_MARGIN + CONTENT_HEIGHT_PX_VERTICAL }}
                     />
 
-                    {/* Centered content area */}
+                    {/* Centered content area ----------------------------- */}
                     <div
-                        className="absolute inset-x-0 flex flex-col items-center justify-center"
+                        className="absolute inset-x-0 flex flex-col items-center justify-between overflow-hidden"
                         style={{
                             height: CONTENT_HEIGHT_PX_VERTICAL,
                             top: VERTICAL_MARGIN
                         }}
                     >
-                        {/* Logo & Address */}
-                        <div className="flex flex-col items-center rotate-90">
-                            <img
-                                src={logoSrc}
-                                alt="Logo"
-                                className="w-[45px] h-auto"
-                            />
-                            <div className="text-[6px] text-center mt-1">
-                                Inhale Bay Smoke Shop<br />
-                                5751 N Main St, #108<br />
-                                Jacksonville, FL 32208
+                        <div className="w-full h-fit bg-yellow-2000">
+
+
+                            {/* Logo & Address */}
+                            <div className="w-full h-full flex flex-col items-center justify-center rotate-90 mb-4 border-r-[1px] border-black">
+                                <img
+                                    src={logoSrc}
+                                    alt="Logo"
+                                    className="w-[45px] h-auto"
+                                />
+                                <div className="w-full text-[6px] text-center">
+                                    <p className="text-[6.5px] font-bold w-full flex flex-col items-center mt-[2px] mb-[4px] leading-[7px]">
+                                        {/* <span>Inhale Bay</span> */}
+                                        <span>Smoke Shop</span>
+                                    </p>
+                                    <p className="w-full flex flex-col items-center leading-[6px]">
+                                        <span>5751 N Main St, #108</span>
+                                        <span>Jacksonville, FL 32208</span>
+                                    </p>
+                                </div>
+
+                                <div className="w-full text-[6px] text-center mt-[3px]">
+                                    <p>inhalebaysmokeshop.com</p>
+                                </div>
+
                             </div>
+
+
                         </div>
 
-                        {/* Warnings & Weights */}
-                        <div className="text-[6px] text-center mt-2">
-                            {WARNINGS.map((line, i) => (
-                                <React.Fragment key={i}>
-                                    {line}
-                                    <br />
-                                </React.Fragment>
-                            ))}
-                            <p> Net Wt: {weight} ({ounceEquivalent(parseFloat(weight))})</p>
-                            <p>Serv Size: {weight} </p>
-                            <p>Qty: 1</p>
-                        </div>
+                        <div className="w-full h-auto bg-indigo-300">
+                            {/* Main Product Name & 21+ */}
+                            <div className="flex flex-col items-center rotate-90">
 
-                        {/* Main Product Name & 21+ */}
-                        <div className="flex flex-col items-center mt-2 rotate-90">
+                                <h4 className="font-bold text-[14px] text-center leading-tight mt-2">
+                                    {firstLine}
+                                    {secondLine && (
+                                        <span className="block text-[12px] font-medium">{secondLine}</span>
+                                    )}
+                                </h4>
+                                <div className="flex items-center gap-1 mt-1">
+                                    <span className="text-xs font-bold">{weight}</span>
+                                    <div className="w-5 h-4 rounded border-2 border-red-500 flex items-center justify-center">
+                                        <span className="text-[7px] font-bold tracking-tighter">21+</span>
+                                    </div>
+                                </div>
 
-                            <h4 className="font-bold text-[14px] text-center leading-tight mt-2">
-                                {firstLine}
-                                {secondLine && (
-                                    <span className="block text-[12px] font-medium">{secondLine}</span>
-                                )}
-                            </h4>
-                            <div className="flex items-center gap-1 mt-1">
-                                <span className="text-xs font-bold">{weight}</span>
-                                <div className="w-5 h-4 rounded border-2 border-red-500 flex items-center justify-center">
-                                    <span className="text-[7px] font-bold tracking-tighter">21+</span>
+
+                                {/* Weights */}
+                                <div className="text-[6px] text-center">
+
+                                    <p>Net Wt: {weight} ({ounceEquivalent(parseFloat(weight))})</p>
+                                    <p>Serv Size: {weight} </p>
+                                    <p>Qty: 1</p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* QR & Batch/THCA/Exp */}
-                        <div className="flex flex-col items-center mt-4 rotate-90">
-                            <p className="text-[6px] italic mb-1">Lab Report</p>
-                            <QRCode
-                                value={qrValue}
-                                size={400}
-                                ecLevel="H"
-                                qrStyle="squares"
-                                fgColor="#000000"
-                                bgColor="#FFFFFF"
-                                quietZone={8}
-                                eyeRadius={[{ outer: 12, inner: 4 }, { outer: 12, inner: 4 }, { outer: 12, inner: 4 }]}
-                                style={{ width: "0.40in", height: "0.40in" }}
-                            />
+                        <div className="w-full h-fit bg-emerald-300 flex flex-col items-center justify-between  border-t-[1px] border-black">
+                            {/* QR & Batch/THCA/Exp */}
+                            <div className="w-full h-full flex flex-col items-center">
+                                <div className="h-full flex flex-col items-center justify-center mt-1 mb-[2.5px]">
+                                    <QRCode
+                                        value={qrValue}
+                                        size={400}
+                                        ecLevel="H"
+                                        qrStyle="squares"
+                                        fgColor="#000000"
+                                        bgColor="#FFFFFF"
+                                        quietZone={8}
+                                        eyeRadius={[{ outer: 12, inner: 4 }, { outer: 12, inner: 4 }, { outer: 12, inner: 4 }]}
+                                        style={{ width: "0.38in", height: "0.38in" }}
+                                    />
+                                    <p className="text-[5px] italic mt-[1px]">Certificate Of Analysis</p>
 
-                            {/* Batch/Exp placeholders */}
-                            <div className="text-[6px] text-center">
-                                <div>Batch#: {batchNumber}</div>
-                                <div>THCA: {thcaMgPerGram} mg per serving</div>
-                                <div>Exp: {getExpirationDate()}</div>
+                                </div>
+
+                                {/* Batch/Exp placeholders */}
+                                <p className="h-full text-[5px] leading-tight flex flex-col items-start">
+                                    <span className="">Batch#: {batchNumber}</span>
+                                    <span className="">THCA: {thcaMgPerGram} mg per serving</span>
+                                    <span className="">Exp: {getExpirationDate()}</span>
+                                </p>
+                            </div>
+
+                            {/* Separator */}
+                            <div className="w-full h-[0.75px] bg-black my-[2px]" />
+
+                            {/* Warnings */}
+                            <div className="h-full text-[5px] text-center leading-tight">
+                                {WARNINGS.map((line, i) => (
+                                    <React.Fragment key={i}>
+                                        {line}
+                                        <br />
+                                    </React.Fragment>
+                                ))}
                             </div>
                         </div>
                     </div>
+
+
+                    {/* Centered content area ----------------------------- */}
+
                 </div>
             </Card>
         );
