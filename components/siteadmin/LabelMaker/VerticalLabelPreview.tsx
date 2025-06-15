@@ -61,11 +61,11 @@ export const VerticalLabelPreview = React.forwardRef<
                 <div ref={wrapperRef} className="w-full h-full">
                     {/* Indicator lines for content bounds */}
                     <div
-                        className="absolute inset-x-0 border-t border-red-500"
+                        className="absolute inset-x-0 border-t border-red-5000"
                         style={{ top: VERTICAL_MARGIN }}
                     />
                     <div
-                        className="absolute inset-x-0 border-b border-red-500"
+                        className="absolute inset-x-0 border-b border-red-5000"
                         style={{ top: VERTICAL_MARGIN + CONTENT_HEIGHT_PX_VERTICAL }}
                     />
 
@@ -78,7 +78,6 @@ export const VerticalLabelPreview = React.forwardRef<
                         }}
                     >
                         <div className="w-full h-fit bg-yellow-2000">
-
 
                             {/* Logo & Address */}
                             <div className="w-full h-full flex flex-col items-center justify-center rotate-90 mb-4 border-r-[1px] border-black">
@@ -107,30 +106,31 @@ export const VerticalLabelPreview = React.forwardRef<
 
                         </div>
 
-                        <div className="w-full h-auto bg-indigo-300">
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-indigo-3000">
                             {/* Main Product Name & 21+ */}
-                            <div className="flex flex-col items-center rotate-90">
+                            <div className="w-full h-fit flex flex-col items-center justify-center rotate-90">
 
-                                <h4 className="font-bold text-[14px] text-center leading-tight mt-2">
-                                    {firstLine}
+                                <h4 className="w-full h-full font-bold text-center leading-tight block whitespace-nowrap">
+                                    <span className="text-[14px]">{firstLine}</span>
                                     {secondLine && (
-                                        <span className="block text-[12px] font-medium">{secondLine}</span>
+                                        <span className="block text-[10px] font-medium">{secondLine}</span>
                                     )}
                                 </h4>
-                                <div className="flex items-center gap-1 mt-1">
-                                    <span className="text-xs font-bold">{weight}</span>
-                                    <div className="w-5 h-4 rounded border-2 border-red-500 flex items-center justify-center">
-                                        <span className="text-[7px] font-bold tracking-tighter">21+</span>
+
+                                <div className="w-full h-full flex flex-row items-center mt-1 ">
+                                    {/* Weights */}
+                                    <div className="w-full h-full text-[6px] text-left leading-[7px]">
+                                        <p>Net Wt: {weight} ({ounceEquivalent(parseFloat(weight))})</p>
+                                        <p>Serv Size: {weight} </p>
+                                        <p>Qty: 1</p>
                                     </div>
-                                </div>
 
-
-                                {/* Weights */}
-                                <div className="text-[6px] text-center">
-
-                                    <p>Net Wt: {weight} ({ounceEquivalent(parseFloat(weight))})</p>
-                                    <p>Serv Size: {weight} </p>
-                                    <p>Qty: 1</p>
+                                    {/* 21+ Indicator */}
+                                    <div className="flex items-center gap-1 mt-1">
+                                        <div className="w-5 h-4 rounded border-2 border-red-500 flex items-center justify-center">
+                                            <span className="text-[7px] font-bold tracking-tighter">21+</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
