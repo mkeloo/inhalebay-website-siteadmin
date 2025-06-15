@@ -58,23 +58,32 @@ export const VerticalLabelPreview = React.forwardRef<
                 style={{ width: OUTER_WIDTH_PX_VERTICAL, height: LABEL_HEIGHT_PX_VERTICAL }}
             >
                 <div
-                    className="w-full flex flex-col items-center justify-center"
+                    className="w-full flex flex-col items-center justify-center border-t border-b border-black"
                     style={{ height: CONTENT_HEIGHT_PX_VERTICAL }}
                 >
                     {/* Logo & Shop Name */}
-                    <div className="w-[] flex flex-col items-center border border-black ">
+                    <div className="w-[] flex flex-col items-center ">
                         <div className="flex flex-col items-center rotate-90">
                             <img
                                 src={logoSrc}
                                 alt="Logo"
                                 className="w-[50px] h-auto border border-black rounded p-1"
                             />
-                            <div className="text-[7px] font-mono font-bold text-center mt-[2px]">
+                            {/* <div className="text-[7px] font-mono font-bold text-center mt-[2px]">
                                 <div>Inhale Bay</div>
-                                {/* <div>Smoke Shop</div> */}
-                            </div>
-                            <div className="text-[5px] font-mono font-semibold text-center">
+                                <div>Smoke Shop</div>
+                            </div> */}
+                            {/* <div className="text-[5px] font-mono font-semibold text-center">
                                 inhalebaysmokeshop.com
+                            </div> */}
+
+                            {/* Company Name & Address */}
+                            <div className="text-[6px] text-left">
+                                <div>Inhale Bay Smoke Shop</div>
+                                <p>
+                                    5751 N Main St, #108<br />
+                                    Jacksonville, FL 32208
+                                </p>
                             </div>
                         </div>
 
@@ -96,7 +105,7 @@ export const VerticalLabelPreview = React.forwardRef<
                     </div>
 
                     {/* Main Product Identity */}
-                    <div className="flex flex-col items-center mt-2 rotate-90 border border-black">
+                    <div className="flex flex-col items-center mt-2 rotate-90">
 
                         <h4 className="font-bold text-[14px] text-center leading-tight mt-2">
                             {firstLine}
@@ -114,21 +123,7 @@ export const VerticalLabelPreview = React.forwardRef<
 
 
                     {/* Additional Info */}
-                    <div className="w-[] flex flex-col items-center mt-2 text-[6px] border border-black">
-
-
-
-
-                        {/* Company Address */}
-                        <div className="text-[6px] text-left">
-                            {/* <div>Distributed by: Discount Pharms, Anytown FL</div> */}
-                            {/* <div>Permit # HEMP-XXXX</div> */}
-                            <div>Inhale Bay Smoke Shop</div>
-                            <p>
-                                5751 N Main St, #108<br />
-                                Jacksonville, FL 32208
-                            </p>
-                        </div>
+                    <div className="w-[] flex flex-col items-center mt-2 text-[6px] ">
 
                         {/* QR Code & Label */}
                         <div className="w-[] flex flex-col items-center rotate-90">
