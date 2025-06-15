@@ -187,7 +187,7 @@ export default function HempLabelMaker() {
             {/* Single-Label Preview */}
             <Card className="w-full lg:w-[40%] space-y-4 text-center p-4">
                 <h2 className="text-3xl font-semibold text-center">Label Preview</h2>
-                <div className="w-full flex flex-col items-center justify-center p-6 border rounded-lg bg-gray-400 shadow-md  ">
+                {/* <div className="w-full flex flex-col items-center justify-center p-6 border rounded-lg bg-gray-400 shadow-md  ">
                     <div ref={labelRef} className="inline-block">
                         <IndividualLabelPreview
                             id="preview-label"
@@ -197,7 +197,7 @@ export default function HempLabelMaker() {
                             logoSrc={inhalebaylogo.src}
                         />
                     </div>
-                </div>
+                </div> */}
                 {/* Vertical Preview with Rotate Toggle */}
                 <div className="w-full flex flex-col items-center justify-center p-6 border rounded-lg bg-gray-400 shadow-md">
                     <Button className="bg-blue-800 text-white hover:bg-sky-500" onClick={() => setVerticalRotated(r => !r)}>
@@ -220,9 +220,9 @@ export default function HempLabelMaker() {
                     </div>
                 </div>
                 <div className="flex flex-col justify-center gap-4">
-                    <Button onClick={downloadLabel} disabled={!selectedProductUrl}>
+                    {/* <Button onClick={downloadLabel} disabled={!selectedProductUrl}>
                         Download Label Image
-                    </Button>
+                    </Button> */}
                     <Button onClick={downloadSecondLabel} disabled={!selectedProductUrl}>
                         Download Second Label Image
                     </Button>
